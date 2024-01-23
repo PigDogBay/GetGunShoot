@@ -29,9 +29,9 @@
 #; %u -
 #; %v - 
 #; %w - 
-#; %x - 
-#; %y - 
-#; %z - 
+#; %x - Player x position
+#; %y - Player y position
+#; %z - Player movement direction, 1 right, 9 left
 #; score - Current score
 #; high - High score
 #; timer - Set with TIME
@@ -96,19 +96,27 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-STOP
+%x,%y=%160,%128
+#;Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
+SPRITE %0,%x,%y,%16,%9
+SPRITE CONTINUE %0,,,%16 TO %17,%$50,%3,%0
+
 ENDPROC
 DEFPROC start()
+PROC state(sLevel)
 ENDPROC
 
 DEFPROC initLevel()
 ENDPROC
 DEFPROC level()
+PROC state(sChase)
 ENDPROC
 
 DEFPROC initChase()
 ENDPROC
 DEFPROC chase()
+PROC inp()
+PROC disp()
 ENDPROC
 
 DEFPROC initShoot()
@@ -163,10 +171,10 @@ LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: rem LAYER OVER 6
 #; LAYER 2,1: LAYER ERASE 0,0,256,192
 
 #; Sprites
-#; BANK NEW bankId
-#; LOAD "GetGunShoot.spr" BANK bankId
-#; SPRITE CLEAR : SPRITE BANK bankId:BANK bankId CLEAR
-#; SPRITE PRINT 1: SPRITE BORDER 1: SPRITE STOP 
+BANK NEW bankId
+LOAD "GetGunShoot.spr" BANK bankId
+SPRITE CLEAR : SPRITE BANK bankId:BANK bankId CLEAR
+SPRITE PRINT 1: SPRITE BORDER 1: SPRITE STOP 
 
 ENDPROC 
 
@@ -184,20 +192,25 @@ ENDPROC
 #; 
 #; *** HANDLE INPUT ***
 #; 
-DEFPROC handleInput()
-%i = INPUT 1| INPUT 0
-IF %i&1 THEN %x+=3
-IF %i&2 THEN %x-=3
+DEFPROC inp()
+%i= INPUT 1| INPUT 0
+#; Update x position of player and direction they are facing
+IF %i&1 THEN %x+=1:%z=1
+IF %i&2 THEN %x-=1:%z=9
 IF %i&$10 THEN PROC fire()
+#; X-Pos bounds check
+IF %x<32 THEN %x=%32
+IF %x>271 THEN %x=%272
+
 ENDPROC 
 
 
 #; 
 #; *** UPDATE DISPLAY  ***
 #; 
-DEFPROC display()
-#! Update player sprite position and pattern
-SPRITE %0,%x,%y:SPRITE MOVE INT
+DEFPROC disp()
+#! Update player sprite position and direction they are facing
+SPRITE %0,%x,%y,,%z:SPRITE MOVE INT
 ENDPROC 
 
 
@@ -249,14 +262,6 @@ ENDPROC
 #; *** PLAYER FIRE ***
 #; 
 DEFPROC fire()
-#; Exit if 3 missiles flying
-IF %SPRITE 9 THEN ENDPROC
-DRIVER %49,%2,%11
-SPRITE %m,%x,%200,%36,%1
-SPRITE CONTINUE %m,%x,%0 TO %200 STEP -8 RUN,%36 TO %37,%3
-%m+=%1: IF %m > 9 THEN %m=%7
-#; Reduce bonus
-bonus-=10
 ENDPROC 
 
 
