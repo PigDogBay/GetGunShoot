@@ -40,7 +40,7 @@
 #; GAME STATES
 #; -----------
 #;
-#; 0 sDemo
+#; 0 sTitle
 #; 1 sStart 
 #; 2 sLevel
 #; 3 sChase
@@ -59,7 +59,7 @@
 
 RUN AT 3
 #; Constants for states
-sDemo, sStart, sLevel, sChase, sShoot, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
+sTitle, sStart, sLevel, sChase, sShoot, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
 PROC initSnd():proc font(): PROC loadHS() TO high :PROC state(sDemo)
 
 #;-----------------------------
@@ -69,7 +69,7 @@ PROC initSnd():proc font(): PROC loadHS() TO high :PROC state(sDemo)
 #;-----------------------------
 
 @g 
-ON %s: proc demo(): PROC start(): PROC level(): PROC chase(): PROC shoot(): PROC die(): PROC gameOver()
+ON %s: proc title(): PROC start(): PROC level(): PROC chase(): PROC shoot(): PROC die(): PROC gameOver()
 PROC anim():GO TO @g
 
 
@@ -78,12 +78,12 @@ PROC anim():GO TO @g
 #;
 DEFPROC state(newState)
 %s = newState
-ON %s: PROC initDemo(): PROC initStart(): PROC initLevel(): PROC initChase(): PROC initShoot(): PROC initDie(): PROC initGameOver()
+ON %s: PROC initTitle(): PROC initStart(): PROC initLevel(): PROC initChase(): PROC initShoot(): PROC initDie(): PROC initGameOver()
 ENDPROC
 
-DEFPROC initDemo()
+DEFPROC initTitle()
 ENDPROC
-DEFPROC demo()
+DEFPROC title()
 ENDPROC
 
 DEFPROC initStart()
