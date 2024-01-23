@@ -1,0 +1,56 @@
+#program dist
+#autoline 10,10
+#; Script to build a distribution binary 
+#; Navigate/cd to the GetGunShoot working directory
+#; Create GetGunShoot.run directory
+#; Copy these files into GetGunShoot.run:
+#;    ayfx.drv
+#;    run.bas
+#;    Reactor.ch8
+#;    README.md
+#;    sfx.afb
+#;    GetGunShoot.spr
+#;    
+#; You will then manually have to load run.bas and SAVE "run.bas" line 10
+#; On the PC copy the folder GetGunShoot.run and zip it up
+#; Add the zip as extra files to the GitHub release
+
+PRINT "Making folder GetGunShoot.run"
+MKDIR "GetGunShoot.run"
+
+PRINT "Copying files"
+COPY "ayfx.drv" TO "GetGunShoot.run/"
+copy "run.bas" TO "GetGunShoot.run/run.bas"
+copy "Reactor.ch8" TO "GetGunShoot.run/"
+copy "README.md" TO "GetGunShoot.run/"
+copy "sfx.afb" TO "GetGunShoot.run/"
+copy "GetGunShoo.spr" TO "GetGunShoot.run/"
+
+PRINT "TO DO"
+PRINT "SAVE run.bas LINE 10"
+PRINT "Test by clicking on GetGunShoot.run from the Browser"
+PRINT "PC: Zip GetGunShoot.run"
+PRINT "PC: distribute!"
+CD "GetGunShoot.run"
+LOAD "run.bas"
+
+STOP
+
+#;Delete contents of GetGunShoot.run and the folder itself
+DEFPROC cleanUp()
+PRINT "Deleting GetGunShoot.run files"
+CD "GetGunShoot.run"
+ERASE "ayfx.drv"
+ERASE "run.bas"
+ERASE "Reactor.ch8"
+ERASE "README.md"
+ERASE "sfx.afb"
+ERASE "GetGunShoo.spr"
+ERASE "*.bak"
+CD ".."
+PRINT "Deleting GetGunShoot.run folder"
+RMDIR "GetGunShoot.run"
+ENDPROC
+
+STOP
+CLEAR:SAVE "dist.bas" LINE 10

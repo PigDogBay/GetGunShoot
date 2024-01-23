@@ -1,0 +1,352 @@
+#program nexions
+#autoline 10,10
+#; MPD Bailey Technology 23rd Jan 2024
+#; Nexions
+#; 
+#; GLOBAL VARIABLES
+#; ----------------
+#; 
+#; %a - 
+#; %b - 
+#; %c - 
+#; %d - 
+#; %e - 
+#; %f - 
+#; %g - 
+#; %h - 
+#; %i - 
+#; %j - 
+#; %k - 
+#; %l - 
+#; %m - 
+#; %n -
+#; %o -
+#; %p -
+#; %q -
+#; %r -
+#; %s - Current State
+#; %t - 
+#; %u -
+#; %v - 
+#; %w - 
+#; %x - 
+#; %y - 
+#; %z - 
+#; score - Current score
+#; high - High score
+#; timer - Set with TIME
+#;
+#;
+#; GAME STATES
+#; -----------
+#;
+#; 0 sDemo
+#; 1 sStart 
+#; 2 sLevel
+#; 3 sChase
+#; 4 sShoot
+#; 5 sDie
+#; 6 sGameOver
+#; 
+#; 
+#; 
+#; 
+#; 
+#; SPRITES
+#; -------
+#; 
+#; 
+
+RUN AT 3
+#; Constants for states
+sDemo, sStart, sLevel, sChase, sShoot, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
+PROC initSnd():proc font(): PROC loadHS() TO high :PROC state(sDemo)
+
+#;-----------------------------
+#;
+#; State Machine Functions
+#;
+#;-----------------------------
+
+@g 
+ON %s: proc demo(): PROC start(): PROC level(): PROC chase(): PROC shoot(): PROC die(): PROC gameOver()
+PROC anim():GO TO @g
+
+
+#;
+#; Enter new state and initialize it
+#;
+DEFPROC state(newState)
+%s = newState
+ON %s: PROC initDemo(): PROC initStart(): PROC initLevel(): PROC initChase(): PROC initShoot(): PROC initDie(): PROC initGameOver()
+ENDPROC
+
+DEFPROC initDemo()
+ENDPROC
+DEFPROC demo()
+ENDPROC
+
+DEFPROC initStart()
+ENDPROC
+DEFPROC start()
+ENDPROC
+
+DEFPROC initLevel()
+ENDPROC
+DEFPROC level()
+ENDPROC
+
+DEFPROC initChase()
+ENDPROC
+DEFPROC chase()
+ENDPROC
+
+DEFPROC initShoot()
+ENDPROC
+DEFPROC shoot()
+ENDPROC
+
+DEFPROC initDie()
+ENDPROC
+DEFPROC die()
+ENDPROC
+
+#; 
+#; *** ENTER STATE: GAME OVER  ***
+#; 
+DEFPROC initGameOver()
+timer = TIME
+LAYER %0: PRINT AT %10,%12;"Game Over"
+LAYER %2,%1
+DRIVER %49,%2,%56
+IF score > high THEN high=score: DRIVER %49,%2,%7:PROC saveHS(high)
+PROC hiScore()
+ENDPROC
+#; 
+#; *** STATE: GAME OVER  ***
+#; 
+DEFPROC gameOver()
+PROC display()
+#; Wait for 2 seconds
+IF (TIME-timer)< 100 THEN ENDPROC 
+%i = INPUT 1| INPUT 0
+IF %i&$10 THEN PROC state(sTitle)
+ENDPROC
+
+
+#;-----------------------------
+#;
+#; Utility Functions
+#; Do NOT change state in these
+#;
+#;-----------------------------
+
+
+#; 
+#; *** INITIALIZE GRAPHICS ***
+#; 
+#; Set up Layers and Sprites
+DEFPROC initGraphics()
+
+#; Layers
+LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: LAYER OVER 6
+LAYER 2,1: LAYER ERASE 0,0,256,192
+
+#; Sprites
+BANK NEW bankId
+LOAD "GeTGunShoot.spr" BANK bankId
+SPRITE CLEAR : SPRITE BANK bankId:BANK bankId CLEAR
+SPRITE PRINT 1: SPRITE BORDER 1: SPRITE STOP 
+
+ENDPROC 
+
+#; Set up AY sound driver and load sound effects
+#; If driver is already installed, will throw an error
+#; So this code will catch and ignore the error
+DEFPROC initSnd()
+    ON ERROR ENDPROC  
+    .install "ayfx.drv"
+    BANK NEW %i
+    LOAD "sfx.afb" BANK %i
+    DRIVER 49,1,%i
+ENDPROC
+
+#; 
+#; *** HANDLE INPUT ***
+#; 
+DEFPROC handleInput()
+%i = INPUT 1| INPUT 0
+IF %i&1 THEN %x+=3
+IF %i&2 THEN %x-=3
+IF %i&$10 THEN THEN PROC fire()
+ENDPROC 
+
+
+#; 
+#; *** UPDATE DISPLAY  ***
+#; 
+DEFPROC display()
+#! Update player sprite position and pattern
+SPRITE %0,%x,%y:SPRITE MOVE INT
+ENDPROC 
+
+
+#; 
+#; *** COLLISION DETECTION ***
+#; 
+DEFPROC colDet()
+FOR %i=%7 TO %9
+%h = SPRITE OVER (%i,%10 TO %20,%7,%7) 
+IF %h>0 THEN PROC destroyEnemy(%h,%i)
+NEXT %i
+
+#; Return true if player has been hit
+ENDPROC = SPRITE OVER (%0,%20 TO %29,%7,%2)
+
+#; 
+#; *** UPDATE SCORE ***
+#; 
+DEFPROC score()
+LAYER %0: PRINT AT %0,%0;score:LAYER %2,%1
+ENDPROC 
+DEFPROC hiScore()
+LAYER %0: PRINT AT %0,%14;high:LAYER %2,%1
+ENDPROC 
+
+
+
+#; 
+#; *** ANIMATE ENEMY SPRITES ***
+#;
+#; Cannot use SPRITE CONTINUE to automate the pattern change
+#; as it is been updated to quickly, (set a rate will slow movement)
+#; So need manually change the pattern every 10 calls
+#;
+DEFPROC anim() 
+%b+=1: IF (%b<>10) AND (%b<>20) THEN ENDPROC
+%j=%d
+#;Animate mothersip and spider
+SPRITE CONTINUE %10,,,%46:SPRITE CONTINUE %20,,,%38
+IF %b=20 THEN %j+=1:%b=0: SPRITE CONTINUE %10,,,%47: SPRITE CONTINUE %20,,,%39
+#;Animate enemies
+FOR %i=%11 TO %19
+SPRITE CONTINUE %i,,,%j
+NEXT %i
+ENDPROC
+
+
+#; 
+#; *** PLAYER FIRE ***
+#; 
+DEFPROC fire()
+#; Exit if 3 missiles flying
+IF %SPRITE 9 THEN ENDPROC
+DRIVER %49,%2,%11
+SPRITE %m,%x,%200,%36,%1
+SPRITE CONTINUE %m,%x,%0 TO %200 STEP -8 RUN,%36 TO %37,%3
+%m+=%1: IF %m > 9 THEN %m=%7
+#; Reduce bonus
+bonus-=10
+ENDPROC 
+
+
+#; 
+#; *** DESTROY ENEMY ***
+#; 
+DEFPROC destroyEnemy(%s,%b)
+PROC kill(%s,%21):SPRITE %b,%0,%0,%0,%0
+#;Spider bomb, set %f=0 to disable counter
+IF %s=20: score+=500: %f=0:DRIVER %49,%2,%1
+#;Mothership 
+ELSE IF %s=10:score+=250: DRIVER %49,%2,%1
+#;Decrease normal enemy count
+ELSE:%c-=%1:score+=50
+ENDIF
+PROC score()
+ENDPROC
+
+
+#; 
+#; *** CLEAR ENEMIES ***
+#; 
+DEFPROC clearEnemies()
+FOR %i=%10 TO %19
+SPRITE %i,%0,%0,%0,%0: SPRITE %i+10,%0,%0,%0,%0
+NEXT %i
+ENDPROC
+
+
+
+
+DEFPROC kill(%s,%m)
+#; Get x,y co-ords
+%i = SPRITE AT (%s,%0) : %j=SPRITE AT (%s,%1)
+#;Show explosion patterns
+#;Patterns 51 to 53
+#;Flags Disable when reach limit and update when stationary
+#;Rate every 10 calls, delay 0
+SPRITE %s,%0,%0,%0,%0:SPRITE %54,%i,%j,%51,%1:SPRITE CONTINUE %54,,,%51 TO %53,$60,%3,%0
+DRIVER %49,%2,%m:PROC bang(%i,%j)
+ENDPROC
+
+#;
+#; Defender style explosion for enemies
+#;
+DEFPROC bang(%x,%y)
+SPRITE 50,%x,%y,%43,%1
+SPRITE 51,%x,%y,%43,%1
+SPRITE 52,%x,%y,%43,%1
+SPRITE 53,%x,%y,%43,%1
+%j=%1+ RND 10
+%k=%10-j
+SPRITE CONTINUE %50,%0 TO %x  STEP %SGN{-j} RUN, %0 TO %y STEP %SGN{-k} RUN, %43,%3
+%j=%1+ RND 10
+%k=%10 - j
+SPRITE CONTINUE %51,%x TO %256 STEP %j RUN, %y TO %192 STEP %k RUN, %43,%3
+%j=%1+ RND 10
+%k=%10 - j
+SPRITE CONTINUE %52,%x TO %256 STEP %j RUN, %0 TO %y STEP %SGN{-k} RUN, %43,%3
+%j=%1+ RND 10
+%k=%10 - j
+SPRITE CONTINUE %53,%0 TO %x STEP % SGN {-j} RUN ,%y TO %192 STEP %k RUN ,%43,%3
+ENDPROC
+
+DEFPROC star()
+IF TIME -timer < 2 THEN ENDPROC
+timer=TIME
+%j=% RND (20)-10:%k=% RND (20)-10
+IF %(j=0) AND (k=0) THEN ENDPROC
+%h=%40+RND(5)
+SPRITE %z,%143+RND(20),%118+RND(20),%h,%1
+SPRITE CONTINUE %z,%0 TO %319 STEP % SGN {j} RUN ,%0 TO %255 STEP % SGN {k} RUN ,%h,%3
+%z+=1:IF %z=120 THEN %z=80
+ENDPROC
+
+#;
+#; High Score Load/Save
+#;
+DEFPROC loadHS()
+LOCAL h()
+ON ERROR ENDPROC =10000
+LOAD "hs.bin" DATA h()
+ENDPROC =h(1)
+
+DEFPROC saveHS(hi)
+LOCAL h() : DIM h(1) : h(1)= hi
+ON ERROR ENDPROC
+SAVE "hs.bin" DATA h()
+ENDPROC
+
+#; 
+#; *** DEBUG PRINT ***
+#; 
+DEFPROC dbg(%i)
+LAYER %0: PRINT AT %21,%0;%i;"    ":LAYER %2,%1
+ENDPROC
+
+DEFPROC font()
+LOAD "Reactor.ch8" CODE %$FA00,768
+POKE 23607,%$F9: POKE 23606,0:PRINT CHR$ 2
+ENDPROC
+
+#autoline

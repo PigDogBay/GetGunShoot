@@ -1,0 +1,14 @@
+#program build
+#autoline 10,10
+
+.sync
+cd "C:/home/GetGunShoot"
+print "Converting to BASIC"
+.txt2bas "build.bas.txt"
+.txt2bas "dist.bas.txt"
+.txt2bas "run.bas.txt"
+load "run.bas"
+;load "build.bas"
+;load "dist.bas"
+STOP
+CLEAR:SAVE "build.bas" LINE 10
