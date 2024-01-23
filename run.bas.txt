@@ -1,4 +1,4 @@
-#program nexions
+#program run
 #autoline 10,10
 #; MPD Bailey Technology 23rd Jan 2024
 #; Nexions
@@ -14,8 +14,8 @@
 #; %f - 
 #; %g - 
 #; %h - 
-#; %i - 
-#; %j - 
+#; %i - tmp
+#; %j - tmp
 #; %k - 
 #; %l - 
 #; %m - 
@@ -60,7 +60,7 @@
 RUN AT 3
 #; Constants for states
 sTitle, sStart, sLevel, sChase, sShoot, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
-PROC initSnd():proc font(): PROC loadHS() TO high :PROC state(sDemo)
+PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
 #;
@@ -69,8 +69,8 @@ PROC initSnd():proc font(): PROC loadHS() TO high :PROC state(sDemo)
 #;-----------------------------
 
 @g 
-ON %s: proc title(): PROC start(): PROC level(): PROC chase(): PROC shoot(): PROC die(): PROC gameOver()
-PROC anim():GO TO @g
+ON %s: PROC title(): PROC start(): PROC level(): PROC chase(): PROC shoot(): PROC die(): PROC gameOver()
+GO TO @g
 
 
 #;
@@ -82,11 +82,21 @@ ON %s: PROC initTitle(): PROC initStart(): PROC initLevel(): PROC initChase(): P
 ENDPROC
 
 DEFPROC initTitle()
+PROC initGraphics()
+#; LOAD "title.sl2" LAYER
+DRIVER %49,%2,%2
+timer= TIME :tmr2= TIME:%t=0
 ENDPROC
+
 DEFPROC title()
+IF (TIME-tmr2)>100 THEN PROC help():tmr2=TIME
+#; Fire to start game
+%i = INPUT 1| INPUT 0
+IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
+STOP
 ENDPROC
 DEFPROC start()
 ENDPROC
@@ -149,14 +159,14 @@ ENDPROC
 DEFPROC initGraphics()
 
 #; Layers
-LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: LAYER OVER 6
-LAYER 2,1: LAYER ERASE 0,0,256,192
+LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: rem LAYER OVER 6
+#; LAYER 2,1: LAYER ERASE 0,0,256,192
 
 #; Sprites
-BANK NEW bankId
-LOAD "GeTGunShoot.spr" BANK bankId
-SPRITE CLEAR : SPRITE BANK bankId:BANK bankId CLEAR
-SPRITE PRINT 1: SPRITE BORDER 1: SPRITE STOP 
+#; BANK NEW bankId
+#; LOAD "GetGunShoot.spr" BANK bankId
+#; SPRITE CLEAR : SPRITE BANK bankId:BANK bankId CLEAR
+#; SPRITE PRINT 1: SPRITE BORDER 1: SPRITE STOP 
 
 ENDPROC 
 
@@ -178,7 +188,7 @@ DEFPROC handleInput()
 %i = INPUT 1| INPUT 0
 IF %i&1 THEN %x+=3
 IF %i&2 THEN %x-=3
-IF %i&$10 THEN THEN PROC fire()
+IF %i&$10 THEN PROC fire()
 ENDPROC 
 
 
@@ -321,6 +331,21 @@ SPRITE %z,%143+RND(20),%118+RND(20),%h,%1
 SPRITE CONTINUE %z,%0 TO %319 STEP % SGN {j} RUN ,%0 TO %255 STEP % SGN {k} RUN ,%h,%3
 %z+=1:IF %z=120 THEN %z=80
 ENDPROC
+
+DEFPROC help()
+LAYER 0
+PRINT AT 18,4;"                       "
+IF %t=0 : PRINT AT 18,10;INK 4;"Avoid Zombie"
+ELSE IF %t=1 : PRINT AT 18,7;INK 3;"Get Gun"
+ELSE IF %t=2 : PRINT AT 18,6;INK 5;"Shoot Zombie"
+ELSE IF %t=3 : PRINT AT 18,10;INK 2;"Collect Coins"
+ELSE IF %t=4 : PRINT AT 18,9;INK 6;"Hi Score ";high
+ELSE IF %t=5 : PRINT AT 18,5;INK 5;"Fire To Start"
+ELSE: PRINT AT 18,9;INK 3;"By Pig Dog Bay"
+ENDIF
+%t+=1:IF %t=7 THEN %t=0
+ENDPROC
+
 
 #;
 #; High Score Load/Save
