@@ -139,7 +139,9 @@ ENDPROC
 DEFPROC chase()
 PROC player()
 PROC zombie()
-PROC colDet()
+#; *** COLLISION DETECTION ***
+%i = SPRITE OVER (%0,%8 TO %14,%7) 
+IF %i=8 THEN PROC state(sFlee)
 ENDPROC
 
 DEFPROC initFlee()
@@ -154,7 +156,6 @@ ENDPROC
 DEFPROC flee ()
 PROC player()
 PROC zomFlee()
-PROC colDet()
 ENDPROC
 
 DEFPROC initDie()
@@ -265,13 +266,6 @@ IF %w > 2488 THEN %w=%32
 SPRITE %9,%w>>3,%y,,%i
 ENDPROC
 
-#; 
-#; *** COLLISION DETECTION ***
-#; 
-DEFPROC colDet()
-%i = SPRITE OVER (%0,%8 TO %14,%7) 
-IF %i=8 THEN PROC state(sFlee)
-ENDPROC
 #; 
 #; *** UPDATE SCORE ***
 #; 
