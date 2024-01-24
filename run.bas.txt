@@ -220,9 +220,9 @@ DEFPROC inp()
 IF %i&1 THEN %x+=1:%z=1
 IF %i&2 THEN %x-=1:%z=9
 IF %i&$10 THEN PROC fire()
-#; X-Pos bounds check
-IF %x<32 THEN %x=%32
-IF %x>271 THEN %x=%272
+#; X-Pos bounds check, warp to otherside of screen
+IF %x<8 THEN %x=%312
+IF %x>312 THEN %x=%8
 
 ENDPROC 
 
