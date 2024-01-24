@@ -27,7 +27,7 @@
 #; %s - Current State
 #; %t - 
 #; %u -
-#; %v - 
+#; %v - Gun x Position
 #; %w - Zombie x Position
 #; %x - Player x position
 #; %y - Player y position
@@ -96,7 +96,15 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-cls: %x,%y,%z,%w=%1276,%128,%1,%320
+CLS 
+ENDPROC
+
+DEFPROC start()
+PROC state(sLevel)
+ENDPROC
+
+DEFPROC initLevel()
+%x,%y,%z,%w,%v=%1276,%128,%1,%320,%480
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
 SPRITE %0,%x>>3,%y,%0,%z
 SPRITE CONTINUE %0,,,%0 TO %1,%$50,%3,%0
@@ -114,22 +122,14 @@ SPRITE %14,%224,%y,%8,%1
 SPRITE CONTINUE %14,,,%8 TO %10,%$50,%3,%0
 
 #; Place Gun
-SPRITE %20,%60,%y,%24,%1
+SPRITE %8,%v>>3,%y,%24,%1
 
 
 #; Place Zombie
-SPRITE %30,%w>>3,%y,%8,%1
-SPRITE CONTINUE %30,,,%16 TO %17,%$58,%3,%10
-
+SPRITE %9,%w>>3,%y,%8,%1
+SPRITE CONTINUE %9,,,%16 TO %17,%$58,%3,%10
 ENDPROC
 
-
-DEFPROC start()
-PROC state(sLevel)
-ENDPROC
-
-DEFPROC initLevel()
-ENDPROC
 DEFPROC level()
 PROC state(sChase)
 ENDPROC
@@ -139,11 +139,22 @@ ENDPROC
 DEFPROC chase()
 PROC player()
 PROC zombie()
+PROC colDet()
 ENDPROC
 
 DEFPROC initShoot()
+#; Remove Gun
+SPRITE %8,,,,%0
+#; Change player pattern
+SPRITE %0,%x>>3,%y,%4,%z
+SPRITE CONTINUE %0,,,%4 TO %5,%$50,%3,%0
+
 ENDPROC
+
 DEFPROC shoot()
+PROC player()
+PROC zomFlee()
+PROC colDet()
 ENDPROC
 
 DEFPROC initDie()
@@ -230,29 +241,37 @@ DEFPROC zombie()
 #; Mirror flag so zombie faces the right direction
 %i=1
 #; Logic to determine quickest path to player, eg go thru a portal 
-IF %w > x : IF %w>(x+1280) THEN %w+=%10: ELSE %w-=%9:%i=%9
+IF %w > x : IF %w>(x+1280) THEN %w+=%9: ELSE %w-=%9:%i=%9
 ELSE IF %x<(w+1280):%w+=%9
-ELSE %w-=%10:%i=%9
+ELSE %w-=%9:%i=%9
 ENDIF
 #; Portal check - warp to other side of the screen
 IF %w<32 THEN %w=%2488
 IF %w > 2488 THEN %w=%32
-SPRITE %30,%w>>3,%y,,%i
+SPRITE %9,%w>>3,%y,,%i
 ENDPROC
 
+DEFPROC zomFlee()
+#; Mirror flag so zombie faces the right direction
+%i=9
+#; Logic to determine quickest path to player, eg go thru a portal 
+IF %w > x : IF %w>(x+1280) THEN %w-=%4: ELSE %w+=%4:%i=%1
+ELSE IF %x<(w+1280):%w-=%4
+ELSE %w+=%4:%i=%1
+ENDIF
+#; Portal check - warp to other side of the screen
+IF %w<32 THEN %w=%2488
+IF %w > 2488 THEN %w=%32
+SPRITE %9,%w>>3,%y,,%i
+ENDPROC
 
 #; 
 #; *** COLLISION DETECTION ***
 #; 
 DEFPROC colDet()
-FOR %i=%7 TO %9
-%h = SPRITE OVER (%i,%10 TO %20,%7,%7) 
-IF %h>0 THEN PROC destroyEnemy(%h,%i)
-NEXT %i
-
-#; Return true if player has been hit
-ENDPROC = SPRITE OVER (%0,%20 TO %29,%7,%2)
-
+%i = SPRITE OVER (%0,%8 TO %14,%7) 
+IF %i=8 THEN PROC state(sShoot)
+ENDPROC
 #; 
 #; *** UPDATE SCORE ***
 #; 
