@@ -28,7 +28,7 @@
 #; %t - 
 #; %u -
 #; %v - 
-#; %w - 
+#; %w - Zombie x Position
 #; %x - Player x position
 #; %y - Player y position
 #; %z - Player movement direction, 1 right, 9 left
@@ -70,7 +70,7 @@ PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 @g 
 ON %s: PROC title(): PROC start(): PROC level(): PROC chase(): PROC shoot(): PROC die(): PROC gameOver()
-GO TO @g
+SPRITE MOVE INT:GO TO @g
 
 
 #;
@@ -96,7 +96,7 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-cls: %x,%y,%z=%160,%128,%1
+cls: %x,%y,%z,%w=%160,%128,%1,%40
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
 SPRITE %0,%x,%y,%0,%z
 SPRITE CONTINUE %0,,,%0 TO %1,%$50,%3,%0
@@ -118,8 +118,8 @@ SPRITE %20,%60,%y,%24,%1
 
 
 #; Place Zombie
-SPRITE %30,%40,%y,%8,%1
-SPRITE CONTINUE %30,%32 TO %288 STEP %2 RUN,,%16 TO %17,%$58,%3,%10
+SPRITE %30,%w,%y,%8,%1
+SPRITE CONTINUE %30,,,%16 TO %17,%$58,%3,%10
 
 ENDPROC
 
@@ -137,8 +137,8 @@ ENDPROC
 DEFPROC initChase()
 ENDPROC
 DEFPROC chase()
-PROC inp()
-PROC disp()
+PROC player()
+PROC zombie()
 ENDPROC
 
 DEFPROC initShoot()
@@ -214,7 +214,7 @@ ENDPROC
 #; 
 #; *** HANDLE INPUT ***
 #; 
-DEFPROC inp()
+DEFPROC player()
 %i= INPUT 1| INPUT 0
 #; Update x position of player and direction they are facing
 IF %i&1 THEN %x+=1:%z=1
@@ -222,18 +222,17 @@ IF %i&2 THEN %x-=1:%z=9
 IF %i&$10 THEN PROC fire()
 #; X-Pos bounds check, warp to otherside of screen
 IF %x<8 THEN %x=%312
-IF %x>312 THEN %x=%8
-
+IF %x > 312 THEN %x=%8
+SPRITE %0,%x,%y,,%z
 ENDPROC 
 
-
-#; 
-#; *** UPDATE DISPLAY  ***
-#; 
-DEFPROC disp()
-#! Update player sprite position and direction they are facing
-SPRITE %0,%x,%y,,%z:SPRITE MOVE INT
-ENDPROC 
+DEFPROC zombie()
+%i=9
+IF %w > x THEN %w-=%1: ELSE %w+=%1:%i=1
+IF %w<8 THEN %w=%8
+IF %x > 312 THEN %w=%312
+SPRITE %30,%w,%y,,%i
+ENDPROC
 
 
 #; 
