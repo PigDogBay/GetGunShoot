@@ -217,8 +217,8 @@ ENDPROC
 DEFPROC player()
 %i= INPUT 1| INPUT 0
 #; Update x position of player and direction they are facing
-IF %i&1 THEN %x+=1:%z=1
-IF %i&2 THEN %x-=1:%z=9
+IF %i&1 THEN %x+=2:%z=1
+IF %i&2 THEN %x-=2:%z=9
 IF %i&$10 THEN PROC fire()
 #; X-Pos bounds check, warp to otherside of screen
 IF %x<8 THEN %x=%312
@@ -227,10 +227,18 @@ SPRITE %0,%x,%y,,%z
 ENDPROC 
 
 DEFPROC zombie()
-%i=9
-IF %w > x THEN %w-=%1: ELSE %w+=%1:%i=1
-IF %w<8 THEN %w=%8
-IF %x > 312 THEN %w=%312
+#; Mirror flag so zombie faces the right direction
+%i=1
+#; Logic to determine quickest path to player, eg go thru a portal 
+IF %w > x : IF %w>(x+160) THEN %w+=1: ELSE %w-=1:%i=%9
+ELSE IF %x<(w+160):%w+=1
+ELSE %w-=1:%i=9
+ENDIF
+
+
+#;IF %w > x THEN %w-=%1: ELSE %w+=%1:%i=1
+IF %w<8 THEN %w=%312
+IF %w > 312 THEN %w=%8
 SPRITE %30,%w,%y,,%i
 ENDPROC
 
