@@ -97,11 +97,33 @@ ENDPROC
 
 DEFPROC initStart()
 %x,%y,%z=%160,%128,%1
-#;Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
-SPRITE %0,%x,%y,%0,%9
+#; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
+SPRITE %0,%x,%y,%0,%z
 SPRITE CONTINUE %0,,,%0 TO %1,%$50,%3,%0
 
+#; Place souls
+SPRITE %10,%32,%y,%8,%1
+SPRITE CONTINUE %10,,,%8 TO %10,%$50,%3,%0
+SPRITE %11,%96,%y,%8,%1
+SPRITE CONTINUE %11,,,%8 TO %10,%$50,%3,%0
+SPRITE %12,%288,%y,%8,%1
+SPRITE CONTINUE %12,,,%8 TO %10,%$50,%3,%0
+SPRITE %13,%248,%y,%8,%1
+SPRITE CONTINUE %13,,,%8 TO %10,%$50,%3,%0
+SPRITE %14,%224,%y,%8,%1
+SPRITE CONTINUE %14,,,%8 TO %10,%$50,%3,%0
+
+#; Place Gun
+SPRITE %20,%60,%y,%24,%1
+
+
+#; Place Zombie
+SPRITE %30,%40,%y,%8,%1
+SPRITE CONTINUE %30,%32 TO %288 STEP %2 RUN,,%16 TO %17,%$58,%3,%10
+
 ENDPROC
+
+
 DEFPROC start()
 PROC state(sLevel)
 ENDPROC
@@ -343,7 +365,7 @@ PRINT AT 18,4;"                       "
 IF %t=0 : PRINT AT 18,10;INK 4;"Avoid Zombie"
 ELSE IF %t=1 : PRINT AT 18,7;INK 3;"Get Gun"
 ELSE IF %t=2 : PRINT AT 18,6;INK 5;"Shoot Zombie"
-ELSE IF %t=3 : PRINT AT 18,10;INK 2;"Collect Coins"
+ELSE IF %t=3 : PRINT AT 18,10;INK 2;"Free The Souls"
 ELSE IF %t=4 : PRINT AT 18,9;INK 6;"Hi Score ";high
 ELSE IF %t=5 : PRINT AT 18,5;INK 5;"Fire To Start"
 ELSE: PRINT AT 18,9;INK 3;"By Pig Dog Bay"
