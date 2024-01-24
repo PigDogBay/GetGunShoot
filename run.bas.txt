@@ -96,9 +96,9 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-cls: %x,%y,%z,%w=%160,%128,%1,%40
+cls: %x,%y,%z,%w=%1276,%128,%1,%320
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
-SPRITE %0,%x,%y,%0,%z
+SPRITE %0,%x>>3,%y,%0,%z
 SPRITE CONTINUE %0,,,%0 TO %1,%$50,%3,%0
 
 #; Place souls
@@ -118,7 +118,7 @@ SPRITE %20,%60,%y,%24,%1
 
 
 #; Place Zombie
-SPRITE %30,%w,%y,%8,%1
+SPRITE %30,%w>>3,%y,%8,%1
 SPRITE CONTINUE %30,,,%16 TO %17,%$58,%3,%10
 
 ENDPROC
@@ -217,27 +217,27 @@ ENDPROC
 DEFPROC player()
 %i= INPUT 1| INPUT 0
 #; Update x position of player and direction they are facing
-IF %i&1 THEN %x+=1:%z=1
-IF %i&2 THEN %x-=1:%z=9
+IF %i&1 THEN %x+=%8:%z=1
+IF %i&2 THEN %x-=%8:%z=9
 IF %i&$10 THEN PROC fire()
 #; X-Pos bounds check, warp to otherside of screen
-IF %x<8 THEN %x=%312
-IF %x > 312 THEN %x=%8
-SPRITE %0,%x,%y,,%z
+IF %x<32 THEN %x=%2488
+IF %x > 2488 THEN %x=%32
+SPRITE %0,%x>>3,%y,,%z
 ENDPROC 
 
 DEFPROC zombie()
 #; Mirror flag so zombie faces the right direction
 %i=1
 #; Logic to determine quickest path to player, eg go thru a portal 
-IF %w > x : IF %w>(x+160) THEN %w+=1: ELSE %w-=1:%i=%9
-ELSE IF %x<(w+160):%w+=1
-ELSE %w-=1:%i=9
+IF %w > x : IF %w>(x+1280) THEN %w+=%10: ELSE %w-=%9:%i=%9
+ELSE IF %x<(w+1280):%w+=%9
+ELSE %w-=%10:%i=%9
 ENDIF
 #; Portal check - warp to other side of the screen
-IF %w<8 THEN %w=%312
-IF %w > 312 THEN %w=%8
-SPRITE %30,%w,%y,,%i
+IF %w<32 THEN %w=%2488
+IF %w > 2488 THEN %w=%32
+SPRITE %30,%w>>3,%y,,%i
 ENDPROC
 
 
