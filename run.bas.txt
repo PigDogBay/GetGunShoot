@@ -59,7 +59,7 @@
 
 RUN AT 3
 #; Constants for states
-sTitle, sStart, sLevel, sChase, sShoot, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
+sTitle, sStart, sLevel, sChase, sFlee, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
@@ -69,7 +69,7 @@ PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 #;-----------------------------
 
 @g 
-ON %s: PROC title(): PROC start(): PROC level(): PROC chase(): PROC shoot(): PROC die(): PROC gameOver()
+ON %s: PROC title(): PROC start(): PROC level(): PROC chase(): PROC flee(): PROC die(): PROC gameOver()
 SPRITE MOVE INT:GO TO @g
 
 
@@ -78,7 +78,7 @@ SPRITE MOVE INT:GO TO @g
 #;
 DEFPROC state(newState)
 %s = newState
-ON %s: PROC initTitle(): PROC initStart(): PROC initLevel(): PROC initChase(): PROC initShoot(): PROC initDie(): PROC initGameOver()
+ON %s: PROC initTitle(): PROC initStart(): PROC initLevel(): PROC initChase(): PROC initFlee(): PROC initDie(): PROC initGameOver()
 ENDPROC
 
 DEFPROC initTitle()
@@ -142,7 +142,7 @@ PROC zombie()
 PROC colDet()
 ENDPROC
 
-DEFPROC initShoot()
+DEFPROC initFlee()
 #; Remove Gun
 SPRITE %8,,,,%0
 #; Change player pattern
@@ -151,7 +151,7 @@ SPRITE CONTINUE %0,,,%4 TO %5,%$50,%3,%0
 
 ENDPROC
 
-DEFPROC shoot()
+DEFPROC flee ()
 PROC player()
 PROC zomFlee()
 PROC colDet()
@@ -270,7 +270,7 @@ ENDPROC
 #; 
 DEFPROC colDet()
 %i = SPRITE OVER (%0,%8 TO %14,%7) 
-IF %i=8 THEN PROC state(sShoot)
+IF %i=8 THEN PROC state(sFlee)
 ENDPROC
 #; 
 #; *** UPDATE SCORE ***
