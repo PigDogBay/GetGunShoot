@@ -96,7 +96,7 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-CLS 
+CLS:score=0
 ENDPROC
 
 DEFPROC start()
@@ -136,19 +136,22 @@ ENDPROC
 
 DEFPROC initChase()
 ENDPROC
+
 DEFPROC chase()
 PROC player()
 PROC zombie()
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%0,%8 TO %14,%7) 
-IF %i=8 THEN PROC state(sFlee)
+IF %i=8: PROC state(sFlee)
+ELSE IF %i=9: PROC state(sDie)
+ENDIF
 ENDPROC
 
 DEFPROC initFlee()
 #; Remove Gun
 SPRITE %8,,,,%0
 #; Change player pattern
-SPRITE %0,%x>>3,%y,%4,%z
+SPRITE %0,,,%4,%z
 SPRITE CONTINUE %0,,,%4 TO %5,%$50,%3,%0
 
 ENDPROC
@@ -159,8 +162,24 @@ PROC zomFlee()
 ENDPROC
 
 DEFPROC initDie()
+#; Change player pattern
+SPRITE %0,,,%40
+SPRITE CONTINUE %0,,,%40 TO %41,%$40,%10,%0
+#; Remove Zombie
+SPRITE %9,,,,%0
+timer = TIME
+LAYER %0: PRINT AT %10,%12;"Game Over"
+DRIVER %49,%2,%56
+IF score > high THEN high=score: DRIVER %49,%2,%7:PROC saveHS(high)
+PROC hiScore()
 ENDPROC
+
 DEFPROC die()
+#; Wait for 2 seconds
+IF (TIME-timer)< 100 THEN ENDPROC 
+%i = INPUT 1| INPUT 0
+IF %i&$10 THEN PROC state(sTitle)
+
 ENDPROC
 
 #; 
@@ -169,7 +188,6 @@ ENDPROC
 DEFPROC initGameOver()
 timer = TIME
 LAYER %0: PRINT AT %10,%12;"Game Over"
-LAYER %2,%1
 DRIVER %49,%2,%56
 IF score > high THEN high=score: DRIVER %49,%2,%7:PROC saveHS(high)
 PROC hiScore()
