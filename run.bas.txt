@@ -99,7 +99,8 @@ ENDPROC
 
 DEFPROC initStart()
 LAYER 0: BORDER 0: PAPER 0: INK 7: CLS : LAYER OVER 6
-LAYER 2,1: PAPER 0: LAYER ERASE 0,0,256,192:CLS: LAYER 0
+LAYER 2,1: PAPER 0: LAYER ERASE 0,0,256,192: CLS : LAYER 0
+LAYER 2,1: LOAD "play.sl2" LAYER
 score=0:PROC score():PROC hiScore()
 ENDPROC
 
@@ -108,7 +109,7 @@ PROC state(sLevel)
 ENDPROC
 
 DEFPROC initLevel()
-%x,%y,%z,%w,%v=%1276,%128,%1,%320,%480
+%x,%y,%z,%w,%v=%1276,%160,%1,%320,%480
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
 SPRITE %0,%x>>3,%y,%0,%z
 SPRITE CONTINUE %0,,,%0 TO %1,%$50,%3,%0
@@ -172,7 +173,7 @@ SPRITE CONTINUE %0,,,%40 TO %41,%$40,%10,%0
 #; Remove Zombie
 SPRITE %9,,,,%0
 timer = TIME
-LAYER %0: PRINT AT %10,%12;INK 2;"Game Over"
+LAYER %0: PRINT AT %13,%12;INK 2;"Game Over"
 DRIVER %49,%2,%56
 IF score > high THEN high=score: DRIVER %49,%2,%7:PROC saveHS(high)
 PROC hiScore()
