@@ -98,8 +98,9 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-CLS :score=0
-
+LAYER 0: BORDER 0: PAPER 0: INK 7: CLS : LAYER OVER 6
+LAYER 2,1: PAPER 0: LAYER ERASE 0,0,256,192:CLS: LAYER 0
+score=0:PROC score():PROC hiScore()
 ENDPROC
 
 DEFPROC start()
@@ -171,7 +172,7 @@ SPRITE CONTINUE %0,,,%40 TO %41,%$40,%10,%0
 #; Remove Zombie
 SPRITE %9,,,,%0
 timer = TIME
-LAYER %0: PRINT AT %10,%12;"Game Over"
+LAYER %0: PRINT AT %10,%12;INK 2;"Game Over"
 DRIVER %49,%2,%56
 IF score > high THEN high=score: DRIVER %49,%2,%7:PROC saveHS(high)
 PROC hiScore()
@@ -291,10 +292,10 @@ ENDPROC
 #; *** UPDATE SCORE ***
 #; 
 DEFPROC score()
-LAYER %0: PRINT AT %0,%0;score:LAYER %2,%1
+LAYER %0: PRINT AT %0,%0;INK 2;score
 ENDPROC 
 DEFPROC hiScore()
-LAYER %0: PRINT AT %0,%14;high:LAYER %2,%1
+LAYER %0: PRINT AT %0,%14;INK 2;high
 ENDPROC 
 
 
