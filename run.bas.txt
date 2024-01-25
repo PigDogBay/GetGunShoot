@@ -60,7 +60,7 @@
 RUN AT 3
 #; Constants for states
 sTitle, sStart, sLevel, sChase, sFlee, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
-PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
+PROC initSnd():PROC initSprites():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
 #;
@@ -82,8 +82,10 @@ ON %s: PROC initTitle(): PROC initStart(): PROC initLevel(): PROC initChase(): P
 ENDPROC
 
 DEFPROC initTitle()
-PROC initGraphics()
-#; LOAD "title.sl2" LAYER
+LAYER 0: BORDER 0: PAPER 0: INK 7: CLS : LAYER CLEAR : LAYER OVER 6
+LAYER 2,1: LAYER ERASE 0,0,256,192
+
+LAYER 2,1: LOAD "title.sl2" LAYER
 DRIVER %49,%2,%2
 timer= TIME :tmr2= TIME:%t=0
 ENDPROC
@@ -96,7 +98,8 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-CLS:score=0
+CLS :score=0
+
 ENDPROC
 
 DEFPROC start()
@@ -216,10 +219,10 @@ ENDPROC
 #; *** INITIALIZE GRAPHICS ***
 #; 
 #; Set up Layers and Sprites
-DEFPROC initGraphics()
+DEFPROC initSprites()
 
 #; Layers
-LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: rem LAYER OVER 6
+#;LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: rem LAYER OVER 6
 #; LAYER 2,1: LAYER ERASE 0,0,256,192
 
 #; Sprites
@@ -397,14 +400,14 @@ ENDPROC
 
 DEFPROC help()
 LAYER 0
-PRINT AT 18,4;"                       "
-IF %t=0 : PRINT AT 18,10;INK 4;"Avoid Zombie"
-ELSE IF %t=1 : PRINT AT 18,7;INK 3;"Get Gun"
-ELSE IF %t=2 : PRINT AT 18,6;INK 5;"Shoot Zombie"
-ELSE IF %t=3 : PRINT AT 18,10;INK 2;"Free The Souls"
-ELSE IF %t=4 : PRINT AT 18,9;INK 6;"Hi Score ";high
-ELSE IF %t=5 : PRINT AT 18,5;INK 5;"Fire To Start"
-ELSE: PRINT AT 18,9;INK 3;"By Pig Dog Bay"
+PRINT AT 20,4;"                       "
+IF %t=0 : PRINT AT 20,10;INK 4;"Avoid Zombie"
+ELSE IF %t=1 : PRINT AT 20,12;INK 3;"Get Gun"
+ELSE IF %t=2 : PRINT AT 20,10;INK 5;"Shoot Zombie"
+ELSE IF %t=3 : PRINT AT 20,9;INK 2;"Free The Souls"
+ELSE IF %t=4 : PRINT AT 20,9;INK 6;"Hi Score ";high
+ELSE IF %t=5 : PRINT AT 20,10;INK 5;"Fire To Start"
+ELSE: PRINT AT 20,9;INK 3;"By Pig Dog Bay"
 ENDIF
 %t+=1:IF %t=7 THEN %t=0
 ENDPROC
