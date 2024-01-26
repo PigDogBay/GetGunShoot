@@ -113,30 +113,32 @@ PROC state(sLevel)
 ENDPROC
 
 DEFPROC initLevel()
-%x,%y,%z,%w,%v=%1276,%160,%1,%320,%480
+%x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
-SPRITE %0,%x>>3,%y,%0,%z
-SPRITE CONTINUE %0,,,%0 TO %1,%$50,%3,%0
+SPRITE %9,%x>>3,%y,%56,%z
+SPRITE -10,%0,%16,%2,%1,%2
+SPRITE CONTINUE %9,,,%56 TO %57,%$50,%3,%0
 
 #; Place souls
-SPRITE %10,%32,%y,%26,%1
-SPRITE CONTINUE %10,,,%26 TO %27,%$50,%4,%0
-SPRITE %11,%96,%y,%26,%1
-SPRITE CONTINUE %11,,,%26 TO %27,%$50,%4,%0
-SPRITE %12,%288,%y,%26,%1
-SPRITE CONTINUE %12,,,%26 TO %27,%$50,%4,%0
-SPRITE %13,%248,%y,%26,%1
-SPRITE CONTINUE %13,,,%26 TO %27,%$50,%4,%0
-SPRITE %14,%224,%y,%26,%1
-SPRITE CONTINUE %14,,,%26 TO %27,%$50,%4,%0
+SPRITE %1,%32,%y,%26,%1
+SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
+SPRITE %2,%96,%y,%26,%1
+SPRITE CONTINUE %2,,,%26 TO %27,%$50,%4,%0
+SPRITE %3,%288,%y,%26,%1
+SPRITE CONTINUE %3,,,%26 TO %27,%$50,%4,%0
+SPRITE %4,%248,%y,%26,%1
+SPRITE CONTINUE %4,,,%26 TO %27,%$50,%4,%0
+SPRITE %5,%224,%y,%26,%1
+SPRITE CONTINUE %5,,,%26 TO %27,%$50,%4,%0
 
 #; Place Gun
-SPRITE %8,%v>>3,%y,%24,%1
-SPRITE CONTINUE %8,,,%24 TO %25,%$50,%3,%0
+SPRITE %6,%v>>3,%y,%24,%1
+SPRITE CONTINUE %6,,,%24 TO %25,%$50,%3,%0
 
 #; Place Zombie
-SPRITE %9,%w>>3,%y,%8,%1
-SPRITE CONTINUE %9,,,%16 TO %17,%$58,%3,%10
+SPRITE %7,%w >> 3,%y,%36,%1
+SPRITE -8,%0,%16,%2,%1,%2
+SPRITE CONTINUE %7,,,%36 TO %37,%$58,%3,%10
 ENDPROC
 
 DEFPROC level()
@@ -150,18 +152,18 @@ DEFPROC chase()
 PROC player()
 PROC zombie()
 #; *** COLLISION DETECTION ***
-%i = SPRITE OVER (%0,%8 TO %14,%7) 
-IF %i=8: PROC state(sFlee)
-ELSE IF %i=9: PROC state(sDie)
+%i = SPRITE OVER (%9,%1 TO %7,%7) 
+IF %i=6: PROC state(sFlee)
+ELSE IF %i=7: PROC state(sDie)
 ENDIF
 ENDPROC
 
 DEFPROC initFlee()
 #; Remove Gun
-SPRITE %8,,,,%0
+SPRITE %6,,,,%0
 #; Change player pattern
-SPRITE %0,,,%4,%z
-SPRITE CONTINUE %0,,,%4 TO %5,%$50,%3,%0
+SPRITE %9,,,%52,%z
+SPRITE CONTINUE %9,,,%52 TO %53,%$50,%3,%0
 
 ENDPROC
 
@@ -263,7 +265,7 @@ IF %i&$10 THEN PROC fire()
 #; X-Pos bounds check, warp to otherside of screen
 IF %x<32 THEN %x=%2488
 IF %x > 2488 THEN %x=%32
-SPRITE %0,%x>>3,%y,,%z
+SPRITE %9,%x>>3,%y,,%z
 ENDPROC 
 
 DEFPROC zombie()
@@ -277,7 +279,7 @@ ENDIF
 #; Portal check - warp to other side of the screen
 IF %w<32 THEN %w=%2488
 IF %w > 2488 THEN %w=%32
-SPRITE %9,%w>>3,%y,,%i
+SPRITE %7,%w>>3,%y,,%i
 ENDPROC
 
 DEFPROC zomFlee()
@@ -291,7 +293,7 @@ ENDIF
 #; Portal check - warp to other side of the screen
 IF %w<32 THEN %w=%2488
 IF %w > 2488 THEN %w=%32
-SPRITE %9,%w>>3,%y,,%i
+SPRITE %7,%w>>3,%y,,%i
 ENDPROC
 
 #; 
@@ -303,27 +305,6 @@ ENDPROC
 DEFPROC hiScore()
 LAYER %0: PRINT AT %0,%14;INK 2;high
 ENDPROC 
-
-
-
-#; 
-#; *** ANIMATE ENEMY SPRITES ***
-#;
-#; Cannot use SPRITE CONTINUE to automate the pattern change
-#; as it is been updated to quickly, (set a rate will slow movement)
-#; So need manually change the pattern every 10 calls
-#;
-DEFPROC anim() 
-%b+=1: IF (%b<>10) AND (%b<>20) THEN ENDPROC
-%j=%d
-#;Animate mothersip and spider
-SPRITE CONTINUE %10,,,%46:SPRITE CONTINUE %20,,,%38
-IF %b=20 THEN %j+=1:%b=0: SPRITE CONTINUE %10,,,%47: SPRITE CONTINUE %20,,,%39
-#;Animate enemies
-FOR %i=%11 TO %19
-SPRITE CONTINUE %i,,,%j
-NEXT %i
-ENDPROC
 
 
 #; 
