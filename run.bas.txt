@@ -7,7 +7,7 @@
 #; ----------------
 #; 
 #; %a - 
-#; %b - 
+#; %b - Pattern change counter
 #; %c - 
 #; %d - 
 #; %e - 
@@ -25,7 +25,7 @@
 #; %q -
 #; %r -
 #; %s - Current State
-#; %t - 
+#; %t - Title state
 #; %u -
 #; %v - Gun x Position
 #; %w - Zombie x Position
@@ -60,7 +60,7 @@
 RUN AT 3
 #; Constants for states
 sTitle, sStart, sLevel, sChase, sFlee, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
-PROC initSnd():PROC initSprites():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
+PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
 #;
@@ -82,15 +82,21 @@ ON %s: PROC initTitle(): PROC initStart(): PROC initLevel(): PROC initChase(): P
 ENDPROC
 
 DEFPROC initTitle()
-LAYER 0: BORDER 0: PAPER 0: INK 7: CLS : LAYER CLEAR : LAYER OVER 6
-LAYER 2,1: LAYER ERASE 0,0,256,192
-
-LAYER 2,1: LOAD "title.sl2" LAYER
+PROC initGraphics("title.sl2")
 DRIVER %49,%2,%2
-timer= TIME :tmr2= TIME:%t=0
+timer= TIME :tmr2= TIME :%t=0
+
+SPRITE %0,%150,%120,%36,%1,%1
+SPRITE -1,%0,%16,%2,%1,%2
+SPRITE CONTINUE %0,%80 TO %220 STEP 1 RUN ,%120,%36,%9,%0
+%b=0
 ENDPROC
 
 DEFPROC title()
+%b+=1
+IF %b=5 THEN SPRITE CONTINUE %0,,,%37
+IF %b=10 THEN SPRITE CONTINUE %0,,,%36:%b=0
+
 IF (TIME-tmr2)>100 THEN PROC help():tmr2=TIME
 #; Fire to start game
 %i = INPUT 1| INPUT 0
@@ -98,9 +104,7 @@ IF %i&$10 THEN PROC state(sStart)
 ENDPROC
 
 DEFPROC initStart()
-LAYER 0: BORDER 0: PAPER 0: INK 7: CLS : LAYER OVER 6
-LAYER 2,1: PAPER 0: LAYER ERASE 0,0,256,192: CLS : LAYER 0
-LAYER 2,1: LOAD "play.sl2" LAYER
+PROC initGraphics("play.sl2")
 score=0:PROC score():PROC hiScore()
 ENDPROC
 
@@ -216,22 +220,23 @@ ENDPROC
 #;
 #;-----------------------------
 
-
 #; 
 #; *** INITIALIZE GRAPHICS ***
 #; 
-#; Set up Layers and Sprites
-DEFPROC initSprites()
-
+#; Set up Layers and Sprites and load in the screen name to layer 2
+DEFPROC initGraphics(scrName$)
 #; Layers
-#;LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: rem LAYER OVER 6
-#; LAYER 2,1: LAYER ERASE 0,0,256,192
+LAYER 0: BORDER 0: PAPER 0: INK 7: CLS :LAYER CLEAR: LAYER OVER 6
+LAYER 2,1: LAYER ERASE 0,0,256,192
 
 #; Sprites
 BANK NEW bankId
 LOAD "GetGunShoot.spr" BANK bankId
 SPRITE CLEAR : SPRITE BANK bankId:BANK bankId CLEAR
-SPRITE PRINT 1: SPRITE BORDER 1: SPRITE STOP 
+SPRITE PRINT 1: SPRITE BORDER 1: SPRITE STOP
+
+#; Load Layer 2 screen
+LAYER 2,1: LOAD scrName$ LAYER: LAYER 0
 
 ENDPROC 
 
