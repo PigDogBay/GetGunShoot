@@ -115,7 +115,9 @@ ENDPROC
 DEFPROC initLevel()
 %x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
-SPRITE %9,%x>>3,%y,%56,%z
+#; Relative flags: 1 - Unified sprite
+SPRITE %9,%x>>3,%y,%56,%z,%1
+#; Relative flags: 2 - pattern is relative to anchor
 SPRITE -10,%0,%16,%2,%1,%2
 SPRITE CONTINUE %9,,,%56 TO %57,%$50,%3,%0
 
@@ -136,7 +138,8 @@ SPRITE %6,%v>>3,%y,%24,%1
 SPRITE CONTINUE %6,,,%24 TO %25,%$50,%3,%0
 
 #; Place Zombie
-SPRITE %7,%w >> 3,%y,%36,%1
+#; Relative flags: 1 - Unified sprite
+SPRITE %7,%w >> 3,%y,%36,%1,%1
 SPRITE -8,%0,%16,%2,%1,%2
 SPRITE CONTINUE %7,,,%36 TO %37,%$58,%3,%10
 ENDPROC
@@ -162,8 +165,12 @@ DEFPROC initFlee()
 #; Remove Gun
 SPRITE %6,,,,%0
 #; Change player pattern
-SPRITE %9,,,%52,%z
-SPRITE CONTINUE %9,,,%52 TO %53,%$50,%3,%0
+SPRITE %9,,,%52
+SPRITE CONTINUE %9,,,%52 TO %53
+
+#; Change Zombie pattern
+SPRITE %7,,,%52,%z
+SPRITE CONTINUE %7,,,%40 TO %41
 
 ENDPROC
 
@@ -265,7 +272,7 @@ IF %i&$10 THEN PROC fire()
 #; X-Pos bounds check, warp to otherside of screen
 IF %x<32 THEN %x=%2488
 IF %x > 2488 THEN %x=%32
-SPRITE %9,%x>>3,%y,,%z
+SPRITE %9,%x >> 3,%y,,%z
 ENDPROC 
 
 DEFPROC zombie()
