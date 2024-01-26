@@ -26,7 +26,7 @@
 #; %r -
 #; %s - Current State
 #; %t - Title state
-#; %u -
+#; %u - Gun state, 0 - no gun, 1-holding gun, 2-gun fired
 #; %v - Gun x Position
 #; %w - Zombie x Position
 #; %x - Player x position
@@ -149,6 +149,8 @@ PROC state(sChase)
 ENDPROC
 
 DEFPROC initChase()
+#; Gun state: empty handed
+%u=0
 ENDPROC
 
 DEFPROC chase()
@@ -172,6 +174,8 @@ SPRITE CONTINUE %9,,,%52 TO %53
 SPRITE %7,,,%52,%z
 SPRITE CONTINUE %7,,,%40 TO %41
 
+#; Gun state: holding gun
+%u=1
 ENDPROC
 
 DEFPROC flee ()
@@ -318,6 +322,26 @@ ENDPROC
 #; *** PLAYER FIRE ***
 #; 
 DEFPROC fire()
+#; Can only fire if you have the gun or has not already been fired
+IF %u <> 1 THEN ENDPROC
+#; Set gun state to fired
+%u=2
+%i= %x>>3
+IF %z=1:
+#;  Shoot right
+%j=%i+8:IF %j>319 THEN %j=319
+SPRITE %20,%j,%y+8,%0,%1
+#; Flags %3 - stop and become invisible
+%j=%i+40:IF %j>319 THEN %j=319
+SPRITE CONTINUE %20,%0 TO %j STEP 4 RUN ,%y+8,%0 TO %3,%3
+ELSE
+#;  Shoot Left
+%j=%i-8:IF %j>319 THEN %j=0
+SPRITE %20,%j,%y+8,%0,%1
+#; Flags %3 - stop and become invisible
+%j=%i-40:IF %j>319 THEN %j=0
+SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
+ENDIF
 ENDPROC 
 
 
