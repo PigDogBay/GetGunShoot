@@ -148,19 +148,21 @@ ENDIF
 
 IF %r=0: PROC zombieFly()
 ELSE IF %r=1: PROC zombie()
+ELSE IF %r=80: PROC zombieSpawn()
+ELSE IF %r>3: %r+=1
 ENDIF
 
 PROC player()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%1 TO %7,%7) 
-IF %i=6: PROC getGun()
+IF %i=6 AND (r<3): PROC getGun()
 ELSE IF %i=7: PROC state(sDie)
+ENDIF
 
 #; Check if zombie shot
 %i= SPRITE OVER (%20,%7,%7)
 IF %i=7 THEN PROC kill()
-ENDIF
 
 ENDPROC
 
@@ -230,10 +232,10 @@ DEFPROC zombieSpawn()
 %w=%64+ RND 189
 #; Place Zombie
 #; Relative flags: 1 - Unified sprite
-SPRITE %7,%w,%60,%36,%1,%1
+SPRITE %7,%w,%60,%40,%1,%1
 SPRITE -8,%0,%16,%2,%1,%2
 #; Drop zombie
-SPRITE CONTINUE %7,STOP,%0 TO %y STEP 1 RUN,%40,%3
+SPRITE CONTINUE %7,STOP,%0 TO %y STEP 1 RUN,%40,%0,%0,%10 + RND 50
 #; Multiply x position by 8 for sub-pixel positioning
 %w=%w<<3
 ENDPROC
@@ -264,8 +266,9 @@ ENDPROC
 
 DEFPROC kill()
 #; Change zombie pattern
-SPRITE %9,,,%32
-SPRITE CONTINUE %9,,,%32 TO %33
+SPRITE %7,,,%32
+SPRITE CONTINUE %7,,,%32 TO %33
+%r=4
 ENDPROC
 
 
