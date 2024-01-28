@@ -156,8 +156,8 @@ PROC player()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%1 TO %7,%7) 
-IF %i=6 AND (r<3): PROC getGun()
-ELSE IF %i=7: PROC state(sDie)
+IF %i=6: PROC getGun()
+ELSE IF %i=7 AND (r<3): PROC state(sDie)
 ENDIF
 
 #; Check if zombie shot
@@ -252,10 +252,12 @@ ENDPROC
 DEFPROC zombie()
 #; Mirror flag so zombie faces the right direction
 %i=1
+#; Zombie speed, charge if player has the gun
+IF %u=2 THEN %j=18: ELSE %j=9
 #; Logic to determine quickest path to player, eg go thru a portal 
-IF %w > x : IF %w>(x+1280) THEN %w+=%9: ELSE %w-=%9:%i=%9
-ELSE IF %x<(w+1280):%w+=%9
-ELSE %w-=%9:%i=%9
+IF %w > x : IF %w>(x+1280) THEN %w+=%j: ELSE %w-=%j:%i=%9
+ELSE IF %x<(w+1280):%w+=%j
+ELSE %w-=%j:%i=%9
 ENDIF
 #; Portal check - warp to other side of the screen
 IF %w<32 THEN %w=%2488
