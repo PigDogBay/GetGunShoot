@@ -55,11 +55,16 @@
 #; SPRITES
 #; -------
 #; 
+#; 1-5   Souls
+#; 6     Gun 
+#; 7-8   Zombie
+#; 9-10  Player
+#; 20    Gun Angel
 #; 
 
 RUN AT 3
 #; Constants for states
-sTitle, sStart, sLevel, sChase, sFlee, sDie, sGameOver=0,1,2,3,4,5,6: timer=0
+sTitle, sStart, sGame, sDie, sGameOver=0,1,2,3,4: timer=0
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
@@ -69,7 +74,7 @@ PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 #;-----------------------------
 
 @g 
-ON %s: PROC title(): PROC start(): PROC level(): PROC chase(): PROC flee(): PROC die(): PROC gameOver()
+ON %s: PROC title(): PROC start(): PROC game(): PROC die(): PROC gameOver()
 SPRITE MOVE INT:GO TO @g
 
 
@@ -78,7 +83,7 @@ SPRITE MOVE INT:GO TO @g
 #;
 DEFPROC state(newState)
 %s = newState
-ON %s: PROC initTitle(): PROC initStart(): PROC initLevel(): PROC initChase(): PROC initFlee(): PROC initDie(): PROC initGameOver()
+ON %s: PROC initTitle(): PROC initStart(): PROC initGame(): PROC initDie(): PROC initGameOver()
 ENDPROC
 
 DEFPROC initTitle()
@@ -109,7 +114,17 @@ score=0:PROC score():PROC hiScore()
 ENDPROC
 
 DEFPROC start()
-PROC state(sLevel)
+PROC state(sGame)
+ENDPROC
+
+DEFPROC initGame()
+#;Player x,y pos, z - dir, w - zombie x, v - gun x
+%x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
+PROC gunSpawn()
+ENDPROC
+
+DEFPROC game()
+IF %u=0 THEN PROC gunFly()
 ENDPROC
 
 DEFPROC initLevel()
@@ -226,6 +241,29 @@ IF (TIME-timer)< 100 THEN ENDPROC
 %i = INPUT 1| INPUT 0
 IF %i&$10 THEN PROC state(sTitle)
 ENDPROC
+
+
+
+DEFPROC gunSpawn()
+#; Set gun state %u to spawn, set random x position for the gun
+%u=0:%i=%64+ RND 189
+#; Gun sprite fly in from right, go to x pos, drop to y pos
+SPRITE %6,319,48,%24,%1
+SPRITE CONTINUE %6,%i TO 319 STEP -2 RUN ,48 TO %y STEP 4 STOP ,%24,1
+#; Gun Angel, fly in front of gun to LHS
+SPRITE %20,303,48,%22,%1
+SPRITE CONTINUE %20,%0 TO 319 STEP -2 RUN,STOP,%22,%3
+ENDPROC
+
+DEFPROC gunFly()
+#; Check y position of the flying gun sprite, if dropped to certain level
+#; Place the gun and animate it, update gun state %u to ready (to be collected)
+%i= SPRITE AT (%6,1)
+IF %i < 130 THEN ENDPROC
+SPRITE PAUSE %6:SPRITE %6,,%y,%24,%1:SPRITE CONTINUE %6,STOP,STOP,%24 TO %25,%$50,%3,%0
+%u=1
+ENDPROC
+
 
 
 #;-----------------------------
