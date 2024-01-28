@@ -120,21 +120,34 @@ ENDPROC
 DEFPROC initGame()
 #;Player x,y pos, z - dir, w - zombie x, v - gun x
 %x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
-PROC gunSpawn()
-ENDPROC
 
-DEFPROC game()
-IF %u=0 THEN PROC gunFly()
-ENDPROC
-
-DEFPROC initLevel()
-%x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
 #; Relative flags: 1 - Unified sprite
 SPRITE %9,%x>>3,%y,%56,%z,%1
 #; Relative flags: 2 - pattern is relative to anchor
 SPRITE -10,%0,%16,%2,%1,%2
 SPRITE CONTINUE %9,,,%56 TO %57,%$50,%3,%0
+
+PROC gunSpawn()
+ENDPROC
+
+DEFPROC game()
+#; Gun state update
+IF %u=0: PROC gunFly()
+ELSE IF %u=3: SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57:PROC gunSpawn()
+ENDIF
+PROC player()
+
+#; *** COLLISION DETECTION ***
+%i = SPRITE OVER (%9,%1 TO %7,%7) 
+IF %i=6: PROC getGun()
+ELSE IF %i=7: PROC state(sDie)
+ENDIF
+
+ENDPROC
+
+DEFPROC initLevel()
+%x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
 
 #; Place souls
 SPRITE %1,%32,%y,%26,%1
@@ -264,7 +277,18 @@ SPRITE PAUSE %6:SPRITE %6,,%y,%24,%1:SPRITE CONTINUE %6,STOP,STOP,%24 TO %25,%$5
 %u=1
 ENDPROC
 
-
+#; Player has walked over the gun
+#; Change player sprite to holding the gun
+#; Remove the gun sprite
+DEFPROC getGun()
+#; Remove Gun
+SPRITE %6,,,,%0
+#; Change player pattern
+SPRITE %9,,,%52
+SPRITE CONTINUE %9,,,%52 TO %53
+#; Update gun state to collected
+%u=2
+ENDPROC
 
 #;-----------------------------
 #;
@@ -363,9 +387,9 @@ ENDPROC
 #; 
 DEFPROC fire()
 #; Can only fire if you have the gun or has not already been fired
-IF %u <> 1 THEN ENDPROC
+IF %u <> 2 THEN ENDPROC
 #; Set gun state to fired
-%u=2
+%u=%3
 %i= %x>>3
 IF %z=1:
 #;  Shoot right
