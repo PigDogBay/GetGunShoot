@@ -157,7 +157,8 @@ PROC player()
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%1 TO %7,%7) 
 IF %i=6: PROC getGun()
-ELSE IF %i=7 AND (r<3): PROC state(sDie)
+#; Only kill player if zombie is active
+ELSE IF %i=7 AND (r=1): PROC state(sDie)
 ENDIF
 
 #; Check if zombie shot
