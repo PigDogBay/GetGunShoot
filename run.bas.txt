@@ -23,10 +23,10 @@
 #; %o -
 #; %p -
 #; %q -
-#; %r -
+#; %r - Zombie State
 #; %s - Current State
 #; %t - Title state
-#; %u - Gun state, 0 - no gun, 1-holding gun, 2-gun fired
+#; %u - Gun state
 #; %v - Gun x Position
 #; %w - Zombie x Position
 #; %x - Player x position
@@ -126,17 +126,12 @@ SPRITE %9,%x>>3,%y,%56,%z,%1
 SPRITE -10,%0,%16,%2,%1,%2
 SPRITE CONTINUE %9,,,%56 TO %57,%$50,%3,%0
 
-#; Place Zombie
-#; Relative flags: 1 - Unified sprite
-SPRITE %7,%w >> 3,%y,%36,%1,%1
-SPRITE -8,%0,%16,%2,%1,%2
-SPRITE CONTINUE %7,,,%36 TO %37,%$58,%3,%10
-
 #; Place souls
 #; SPRITE %1,%32,%y,%26,%1
 #; SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
 
 PROC gunSpawn()
+PROC zombieSpawn()
 ENDPROC
 
 DEFPROC game()
@@ -150,13 +145,21 @@ IF %u=0: PROC gunFly()
 ELSE IF %u=20: SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57:PROC gunSpawn()
 ELSE IF %u>2: %u+=1
 ENDIF
+
+IF %r=0: PROC zombieFly()
+ELSE IF %r=1: PROC zombie()
+ENDIF
+
 PROC player()
-PROC zombie()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%1 TO %7,%7) 
 IF %i=6: PROC getGun()
 ELSE IF %i=7: PROC state(sDie)
+
+#; Check if zombie shot
+%i= SPRITE OVER (%20,%7,%7)
+IF %i=7 THEN PROC kill()
 ENDIF
 
 ENDPROC
@@ -218,6 +221,38 @@ SPRITE %9,,,%52
 SPRITE CONTINUE %9,,,%52 TO %53
 #; Update gun state to collected
 %u=2
+ENDPROC
+
+DEFPROC zombieSpawn()
+#; Set zombie state to spawning
+%r=0
+#; Random x position for zombie
+%w=%64+ RND 189
+#; Place Zombie
+#; Relative flags: 1 - Unified sprite
+SPRITE %7,%w,%60,%36,%1,%1
+SPRITE -8,%0,%16,%2,%1,%2
+#; Drop zombie
+SPRITE CONTINUE %7,STOP,%0 TO %y STEP 1 RUN,%40,%3
+#; Multiply x position by 8 for sub-pixel positioning
+%w=%w<<3
+ENDPROC
+
+DEFPROC zombieFly()
+#; Check y position of the spawning zombie sprite, if dropped to certain level
+#; stop moving and start chasing the player
+%i= SPRITE AT (%7,1)
+IF %i < 130 THEN ENDPROC
+SPRITE %7,%w>>3,%y,%36,%1:SPRITE CONTINUE %7,,STOP,%36 TO %37,%$58,%3,%0
+%r=1
+ENDPROC
+
+
+DEFPROC kill()
+#; Change zombie pattern
+SPRITE %9,,,%32
+SPRITE CONTINUE %9,,,%32 TO %33
+
 ENDPROC
 
 #;-----------------------------
@@ -362,20 +397,6 @@ DEFPROC clearEnemies()
 FOR %i=%10 TO %19
 SPRITE %i,%0,%0,%0,%0: SPRITE %i+10,%0,%0,%0,%0
 NEXT %i
-ENDPROC
-
-
-
-
-DEFPROC kill(%s,%m)
-#; Get x,y co-ords
-%i = SPRITE AT (%s,%0) : %j=SPRITE AT (%s,%1)
-#;Show explosion patterns
-#;Patterns 51 to 53
-#;Flags Disable when reach limit and update when stationary
-#;Rate every 10 calls, delay 0
-SPRITE %s,%0,%0,%0,%0:SPRITE %54,%i,%j,%51,%1:SPRITE CONTINUE %54,,,%51 TO %53,$60,%3,%0
-DRIVER %49,%2,%m:PROC bang(%i,%j)
 ENDPROC
 
 #;
