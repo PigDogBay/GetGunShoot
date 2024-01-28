@@ -59,7 +59,8 @@
 #; 6     Gun 
 #; 7-8   Zombie
 #; 9-10  Player
-#; 20    Gun Angel
+#; 20    Shotgun blast
+#; 21    Gun Angel
 #; 
 
 RUN AT 3
@@ -264,8 +265,8 @@ DEFPROC gunSpawn()
 SPRITE %6,319,48,%24,%1
 SPRITE CONTINUE %6,%i TO 319 STEP -2 RUN ,48 TO %y STEP 4 STOP ,%24,1
 #; Gun Angel, fly in front of gun to LHS
-SPRITE %20,303,48,%22,%1
-SPRITE CONTINUE %20,%0 TO 319 STEP -2 RUN,STOP,%22,%3
+SPRITE %21,303,48,%22,%1
+SPRITE CONTINUE %21,%0 TO 319 STEP -2 RUN,STOP,%22,%3
 ENDPROC
 
 DEFPROC gunFly()
