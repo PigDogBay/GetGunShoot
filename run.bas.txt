@@ -263,7 +263,7 @@ DEFPROC gunSpawn()
 %u=0:%i=%64+ RND 189
 #; Gun sprite fly in from right, go to x pos, drop to y pos
 SPRITE %6,319,48,%24,%1
-SPRITE CONTINUE %6,%i TO 319 STEP -2 RUN ,48 TO %y STEP 4 STOP ,%24,1
+SPRITE CONTINUE %6,%i TO 319 STEP -2 RUN ,48 TO %y STEP 4 STOP ,%24,1,%0,%0
 #; Gun Angel, fly in front of gun to LHS
 SPRITE %21,303,48,%22,%1
 SPRITE CONTINUE %21,%0 TO 319 STEP -2 RUN,STOP,%22,%3
