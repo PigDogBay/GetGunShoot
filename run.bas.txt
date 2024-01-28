@@ -247,20 +247,65 @@ SPRITE %7,%w>>3,%y,%36,%1:SPRITE CONTINUE %7,,STOP,%36 TO %37,%$58,%3,%0
 %r=1
 ENDPROC
 
+DEFPROC zombie()
+#; Mirror flag so zombie faces the right direction
+%i=1
+#; Logic to determine quickest path to player, eg go thru a portal 
+IF %w > x : IF %w>(x+1280) THEN %w+=%9: ELSE %w-=%9:%i=%9
+ELSE IF %x<(w+1280):%w+=%9
+ELSE %w-=%9:%i=%9
+ENDIF
+#; Portal check - warp to other side of the screen
+IF %w<32 THEN %w=%2488
+IF %w > 2488 THEN %w=%32
+SPRITE %7,%w>>3,%y,,%i
+ENDPROC
+
 
 DEFPROC kill()
 #; Change zombie pattern
 SPRITE %9,,,%32
 SPRITE CONTINUE %9,,,%32 TO %33
-
 ENDPROC
 
-#;-----------------------------
-#;
-#; Utility Functions
-#; Do NOT change state in these
-#;
-#;-----------------------------
+
+DEFPROC player()
+%i= INPUT 1| INPUT 0
+#; Update x position of player and direction they are facing
+IF %i&1 THEN %x+=%8:%z=1
+IF %i&2 THEN %x-=%8:%z=9
+IF %i&$10 THEN PROC fire()
+#; X-Pos bounds check, warp to otherside of screen
+IF %x<32 THEN %x=%2488
+IF %x > 2488 THEN %x=%32
+SPRITE %9,%x >> 3,%y,,%z
+ENDPROC 
+
+#; 
+#; *** PLAYER FIRE ***
+#; 
+DEFPROC fire()
+#; Can only fire if you have the gun or has not already been fired
+IF %u <> 2 THEN ENDPROC
+#; Set gun state to fired
+%u=%3
+%i= %x>>3
+IF %z=1:
+#;  Shoot right
+%j=%i+8:IF %j>319 THEN %j=319
+SPRITE %20,%j,%y+8,%0,%1
+#; Flags %3 - stop and become invisible
+%j=%i+40:IF %j>319 THEN %j=319
+SPRITE CONTINUE %20,%0 TO %j STEP 4 RUN ,%y+8,%0 TO %3,%3
+ELSE
+#;  Shoot Left
+%j=%i-8:IF %j>319 THEN %j=0
+SPRITE %20,%j,%y+8,%0,%1
+#; Flags %3 - stop and become invisible
+%j=%i-40:IF %j>319 THEN %j=0
+SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
+ENDIF
+ENDPROC 
 
 #; 
 #; *** INITIALIZE GRAPHICS ***
@@ -293,91 +338,6 @@ DEFPROC initSnd()
     DRIVER 49,1,%i
 ENDPROC
 
-DEFPROC player()
-%i= INPUT 1| INPUT 0
-#; Update x position of player and direction they are facing
-IF %i&1 THEN %x+=%8:%z=1
-IF %i&2 THEN %x-=%8:%z=9
-IF %i&$10 THEN PROC fire()
-#; X-Pos bounds check, warp to otherside of screen
-IF %x<32 THEN %x=%2488
-IF %x > 2488 THEN %x=%32
-SPRITE %9,%x >> 3,%y,,%z
-ENDPROC 
-
-DEFPROC zombie()
-#; Mirror flag so zombie faces the right direction
-%i=1
-#; Logic to determine quickest path to player, eg go thru a portal 
-IF %w > x : IF %w>(x+1280) THEN %w+=%9: ELSE %w-=%9:%i=%9
-ELSE IF %x<(w+1280):%w+=%9
-ELSE %w-=%9:%i=%9
-ENDIF
-#; Portal check - warp to other side of the screen
-IF %w<32 THEN %w=%2488
-IF %w > 2488 THEN %w=%32
-SPRITE %7,%w>>3,%y,,%i
-ENDPROC
-
-#; 
-#; *** UPDATE SCORE ***
-#; 
-DEFPROC score()
-LAYER %0: PRINT AT %0,%0;INK 2;score
-ENDPROC 
-DEFPROC hiScore()
-LAYER %0: PRINT AT %0,%14;INK 2;high
-ENDPROC 
-
-
-#; 
-#; *** PLAYER FIRE ***
-#; 
-DEFPROC fire()
-#; Can only fire if you have the gun or has not already been fired
-IF %u <> 2 THEN ENDPROC
-#; Set gun state to fired
-%u=%3
-%i= %x>>3
-IF %z=1:
-#;  Shoot right
-%j=%i+8:IF %j>319 THEN %j=319
-SPRITE %20,%j,%y+8,%0,%1
-#; Flags %3 - stop and become invisible
-%j=%i+40:IF %j>319 THEN %j=319
-SPRITE CONTINUE %20,%0 TO %j STEP 4 RUN ,%y+8,%0 TO %3,%3
-ELSE
-#;  Shoot Left
-%j=%i-8:IF %j>319 THEN %j=0
-SPRITE %20,%j,%y+8,%0,%1
-#; Flags %3 - stop and become invisible
-%j=%i-40:IF %j>319 THEN %j=0
-SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
-ENDIF
-ENDPROC 
-
-#;
-#; Defender style explosion for enemies
-#;
-DEFPROC bang(%x,%y)
-SPRITE 50,%x,%y,%43,%1
-SPRITE 51,%x,%y,%43,%1
-SPRITE 52,%x,%y,%43,%1
-SPRITE 53,%x,%y,%43,%1
-%j=%1+ RND 10
-%k=%10-j
-SPRITE CONTINUE %50,%0 TO %x  STEP %SGN{-j} RUN, %0 TO %y STEP %SGN{-k} RUN, %43,%3
-%j=%1+ RND 10
-%k=%10 - j
-SPRITE CONTINUE %51,%x TO %256 STEP %j RUN, %y TO %192 STEP %k RUN, %43,%3
-%j=%1+ RND 10
-%k=%10 - j
-SPRITE CONTINUE %52,%x TO %256 STEP %j RUN, %0 TO %y STEP %SGN{-k} RUN, %43,%3
-%j=%1+ RND 10
-%k=%10 - j
-SPRITE CONTINUE %53,%0 TO %x STEP % SGN {-j} RUN ,%y TO %192 STEP %k RUN ,%43,%3
-ENDPROC
-
 DEFPROC help()
 LAYER 0
 PRINT AT 20,4;"                       "
@@ -392,10 +352,16 @@ ENDIF
 %t+=1:IF %t=7 THEN %t=0
 ENDPROC
 
+#; 
+#; *** SCORE ***
+#; 
+DEFPROC score()
+LAYER %0: PRINT AT %0,%0;INK 2;score
+ENDPROC 
+DEFPROC hiScore()
+LAYER %0: PRINT AT %0,%14;INK 2;high
+ENDPROC 
 
-#;
-#; High Score Load/Save
-#;
 DEFPROC loadHS()
 LOCAL h()
 ON ERROR ENDPROC =10000
