@@ -42,11 +42,8 @@
 #;
 #; 0 sTitle
 #; 1 sStart 
-#; 2 sLevel
-#; 3 sChase
-#; 4 sShoot
-#; 5 sDie
-#; 6 sGameOver
+#; 2 sGame
+#; 3 sDie
 #; 
 #; 
 #; 
@@ -65,7 +62,7 @@
 
 RUN AT 3
 #; Constants for states
-sTitle, sStart, sGame, sDie, sGameOver=0,1,2,3,4: timer=0
+sTitle, sStart, sGame, sDie=0,1,2,3: timer=0
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
@@ -129,6 +126,16 @@ SPRITE %9,%x>>3,%y,%56,%z,%1
 SPRITE -10,%0,%16,%2,%1,%2
 SPRITE CONTINUE %9,,,%56 TO %57,%$50,%3,%0
 
+#; Place Zombie
+#; Relative flags: 1 - Unified sprite
+SPRITE %7,%w >> 3,%y,%36,%1,%1
+SPRITE -8,%0,%16,%2,%1,%2
+SPRITE CONTINUE %7,,,%36 TO %37,%$58,%3,%10
+
+#; Place souls
+#; SPRITE %1,%32,%y,%26,%1
+#; SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
+
 PROC gunSpawn()
 ENDPROC
 
@@ -144,6 +151,7 @@ ELSE IF %u=20: SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57:PROC gunSpawn()
 ELSE IF %u>2: %u+=1
 ENDIF
 PROC player()
+PROC zombie()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%1 TO %7,%7) 
@@ -151,71 +159,6 @@ IF %i=6: PROC getGun()
 ELSE IF %i=7: PROC state(sDie)
 ENDIF
 
-ENDPROC
-
-DEFPROC initLevel()
-%x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
-
-#; Place souls
-SPRITE %1,%32,%y,%26,%1
-SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
-SPRITE %2,%96,%y,%26,%1
-SPRITE CONTINUE %2,,,%26 TO %27,%$50,%4,%0
-SPRITE %3,%288,%y,%26,%1
-SPRITE CONTINUE %3,,,%26 TO %27,%$50,%4,%0
-SPRITE %4,%248,%y,%26,%1
-SPRITE CONTINUE %4,,,%26 TO %27,%$50,%4,%0
-SPRITE %5,%224,%y,%26,%1
-SPRITE CONTINUE %5,,,%26 TO %27,%$50,%4,%0
-
-#; Place Gun
-SPRITE %6,%v>>3,%y,%24,%1
-SPRITE CONTINUE %6,,,%24 TO %25,%$50,%3,%0
-
-#; Place Zombie
-#; Relative flags: 1 - Unified sprite
-SPRITE %7,%w >> 3,%y,%36,%1,%1
-SPRITE -8,%0,%16,%2,%1,%2
-SPRITE CONTINUE %7,,,%36 TO %37,%$58,%3,%10
-ENDPROC
-
-DEFPROC level()
-PROC state(sChase)
-ENDPROC
-
-DEFPROC initChase()
-#; Gun state: empty handed
-%u=0
-ENDPROC
-
-DEFPROC chase()
-PROC player()
-PROC zombie()
-#; *** COLLISION DETECTION ***
-%i = SPRITE OVER (%9,%1 TO %7,%7) 
-IF %i=6: PROC state(sFlee)
-ELSE IF %i=7: PROC state(sDie)
-ENDIF
-ENDPROC
-
-DEFPROC initFlee()
-#; Remove Gun
-SPRITE %6,,,,%0
-#; Change player pattern
-SPRITE %9,,,%52
-SPRITE CONTINUE %9,,,%52 TO %53
-
-#; Change Zombie pattern
-SPRITE %7,,,%52,%z
-SPRITE CONTINUE %7,,,%40 TO %41
-
-#; Gun state: holding gun
-%u=1
-ENDPROC
-
-DEFPROC flee ()
-PROC player()
-PROC zomFlee()
 ENDPROC
 
 DEFPROC initDie()
@@ -234,33 +177,13 @@ PROC hiScore()
 ENDPROC
 
 DEFPROC die()
-#; Wait for 2 seconds
-IF (TIME-timer)< 100 THEN ENDPROC 
-%i = INPUT 1| INPUT 0
-IF %i&$10 THEN PROC state(sTitle)
-
-ENDPROC
-
-#; 
-#; *** ENTER STATE: GAME OVER  ***
-#; 
-DEFPROC initGameOver()
-timer = TIME
-LAYER %0: PRINT AT %10,%12;"Game Over"
-DRIVER %49,%2,%56
-IF score > high THEN high=score: DRIVER %49,%2,%7:PROC saveHS(high)
-PROC hiScore()
-ENDPROC
-#; 
-#; *** STATE: GAME OVER  ***
-#; 
-DEFPROC gameOver()
-PROC display()
+IF %u=0 THEN PROC gunFly()
 #; Wait for 2 seconds
 IF (TIME-timer)< 100 THEN ENDPROC 
 %i = INPUT 1| INPUT 0
 IF %i&$10 THEN PROC state(sTitle)
 ENDPROC
+
 
 
 
