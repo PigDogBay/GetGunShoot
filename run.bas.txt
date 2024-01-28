@@ -133,9 +133,15 @@ PROC gunSpawn()
 ENDPROC
 
 DEFPROC game()
-#; Gun state update
+#; Gun states
+#; 0 spawn, being dropped in
+#; 1 ready to be collected
+#; 2 player holding gun
+#; 3-19 firing state
+#; 20 - end of fired
 IF %u=0: PROC gunFly()
-ELSE IF %u=3: SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57:PROC gunSpawn()
+ELSE IF %u=20: SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57:PROC gunSpawn()
+ELSE IF %u>2: %u+=1
 ENDIF
 PROC player()
 
