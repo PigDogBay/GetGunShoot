@@ -293,9 +293,6 @@ DEFPROC initSnd()
     DRIVER 49,1,%i
 ENDPROC
 
-#; 
-#; *** HANDLE INPUT ***
-#; 
 DEFPROC player()
 %i= INPUT 1| INPUT 0
 #; Update x position of player and direction they are facing
@@ -315,20 +312,6 @@ DEFPROC zombie()
 IF %w > x : IF %w>(x+1280) THEN %w+=%9: ELSE %w-=%9:%i=%9
 ELSE IF %x<(w+1280):%w+=%9
 ELSE %w-=%9:%i=%9
-ENDIF
-#; Portal check - warp to other side of the screen
-IF %w<32 THEN %w=%2488
-IF %w > 2488 THEN %w=%32
-SPRITE %7,%w>>3,%y,,%i
-ENDPROC
-
-DEFPROC zomFlee()
-#; Mirror flag so zombie faces the right direction
-%i=9
-#; Logic to determine quickest path to player, eg go thru a portal 
-IF %w > x : IF %w>(x+1280) THEN %w-=%4: ELSE %w+=%4:%i=%1
-ELSE IF %x<(w+1280):%w-=%4
-ELSE %w+=%4:%i=%1
 ENDIF
 #; Portal check - warp to other side of the screen
 IF %w<32 THEN %w=%2488
@@ -373,32 +356,6 @@ SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
 ENDIF
 ENDPROC 
 
-
-#; 
-#; *** DESTROY ENEMY ***
-#; 
-DEFPROC destroyEnemy(%s,%b)
-PROC kill(%s,%21):SPRITE %b,%0,%0,%0,%0
-#;Spider bomb, set %f=0 to disable counter
-IF %s=20: score+=500: %f=0:DRIVER %49,%2,%1
-#;Mothership 
-ELSE IF %s=10:score+=250: DRIVER %49,%2,%1
-#;Decrease normal enemy count
-ELSE:%c-=%1:score+=50
-ENDIF
-PROC score()
-ENDPROC
-
-
-#; 
-#; *** CLEAR ENEMIES ***
-#; 
-DEFPROC clearEnemies()
-FOR %i=%10 TO %19
-SPRITE %i,%0,%0,%0,%0: SPRITE %i+10,%0,%0,%0,%0
-NEXT %i
-ENDPROC
-
 #;
 #; Defender style explosion for enemies
 #;
@@ -419,17 +376,6 @@ SPRITE CONTINUE %52,%x TO %256 STEP %j RUN, %0 TO %y STEP %SGN{-k} RUN, %43,%3
 %j=%1+ RND 10
 %k=%10 - j
 SPRITE CONTINUE %53,%0 TO %x STEP % SGN {-j} RUN ,%y TO %192 STEP %k RUN ,%43,%3
-ENDPROC
-
-DEFPROC star()
-IF TIME -timer < 2 THEN ENDPROC
-timer=TIME
-%j=% RND (20)-10:%k=% RND (20)-10
-IF %(j=0) AND (k=0) THEN ENDPROC
-%h=%40+RND(5)
-SPRITE %z,%143+RND(20),%118+RND(20),%h,%1
-SPRITE CONTINUE %z,%0 TO %319 STEP % SGN {j} RUN ,%0 TO %255 STEP % SGN {k} RUN ,%h,%3
-%z+=1:IF %z=120 THEN %z=80
 ENDPROC
 
 DEFPROC help()
