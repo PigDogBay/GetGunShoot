@@ -6,7 +6,7 @@
 #; GLOBAL VARIABLES
 #; ----------------
 #; 
-#; %a - 
+#; %a - Fire button count, prevent user holding down fire
 #; %b - Pattern change counter
 #; %c - 
 #; %d - 
@@ -21,7 +21,7 @@
 #; %m - 
 #; %n -
 #; %o -
-#; %p -
+#; %p - 
 #; %q - Player Boost state
 #; %r - Zombie State
 #; %s - Current State
@@ -114,7 +114,7 @@ ENDPROC
 
 DEFPROC initStart()
 PROC initGraphics("play.sl2")
-score=0:PROC score():PROC hiScore()
+score=0: PROC score(): PROC hiScore()
 ENDPROC
 
 DEFPROC start()
@@ -284,10 +284,15 @@ ENDPROC
 DEFPROC player()
 %i= INPUT 1| INPUT 0
 #; Update x position of player and direction they are facing
-IF %i&1 THEN %x+=%8:%z=1
-IF %i&2 THEN %x-=%8:%z=9
-#; Can only fire if you have the gun and has not already been fired
-IF %i&$10 AND (u=2) THEN PROC fire()
+IF %i&1 THEN %x+=%8+q:%z=1
+IF %i&2 THEN %x-=%8+q:%z=9
+IF %q > 0 THEN %q-=%1
+#; Prevent user holding down the fire button, %a - button press down counts
+IF %i&$10 THEN %a+=1 : ELSE %a=0
+#; Can only fire if you have the gun and has not already been fired(%u gun state)
+IF %a=1 AND (u=2) THEN PROC fire():%a+=%1
+#; Apply boost
+IF %a=1 AND (q=0) THEN %q=20:%a+=%1
 #; X-Pos bounds check, warp to otherside of screen
 IF %x<32 THEN %x=%2488
 IF %x > 2488 THEN %x=%32
