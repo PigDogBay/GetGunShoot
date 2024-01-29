@@ -21,7 +21,7 @@
 #; %m - 
 #; %n -
 #; %o -
-#; %p - 
+#; %p - Player number of boosts available 
 #; %q - Player Boost state
 #; %r - Zombie State
 #; %s - Current State
@@ -124,6 +124,8 @@ ENDPROC
 DEFPROC initGame()
 #;Player x,y pos, z - dir, w - zombie x, v - gun x
 %x,%y,%z,%w,%v=%1276,%144,%1,%320,%480
+#; Speed boosts
+%p=%3
 
 #; Player Sprite, flags: Update pattern when stationary, bounce between limits, update every 3rd frame
 #; Relative flags: 1 - Unified sprite
@@ -284,20 +286,30 @@ ENDPROC
 DEFPROC player()
 %i= INPUT 1| INPUT 0
 #; Update x position of player and direction they are facing
+#; Apply any speed boost to the player
 IF %i&1 THEN %x+=%8+q:%z=1
 IF %i&2 THEN %x-=%8+q:%z=9
 IF %q > 0 THEN %q-=%1
 #; Prevent user holding down the fire button, %a - button press down counts
+#; Only fire when %a=1, resets to 0 when player releases the fire button
 IF %i&$10 THEN %a+=1 : ELSE %a=0
+IF %a=1:%a+=%1
 #; Can only fire if you have the gun and has not already been fired(%u gun state)
-IF %a=1 AND (u=2) THEN PROC fire():%a+=%1
-#; Apply boost
-IF %a=1 AND (q=0) THEN %q=20:%a+=%1
+#; If not holding the gun then apply a speed boost to the player
+IF %u=2 THEN PROC fire() : ELSE PROC boost()
+ENDIF
+
 #; X-Pos bounds check, warp to otherside of screen
 IF %x<32 THEN %x=%2488
 IF %x > 2488 THEN %x=%32
 SPRITE %9,%x >> 3,%y,,%z
-ENDPROC 
+ENDPROC
+
+#; %q Speed boost counter
+#; %p Number of speed boosts available to the player 
+DEFPROC boost()
+IF %q=0 AND (p>0) THEN %q=20:%p-=%1
+ENDPROC
 
 #; 
 #; *** PLAYER FIRE ***
