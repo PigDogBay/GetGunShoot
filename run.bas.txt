@@ -115,6 +115,10 @@ ENDPROC
 DEFPROC initStart()
 PROC initGraphics("play.sl2")
 score=0: PROC score(): PROC hiScore()
+SPRITE %120,%16,%144,%4,%1,%0,%0,%1
+SPRITE %121,%288,%144,%4,%9,%0,%0,%1
+SPRITE CONTINUE %120,,,%4 TO %5,%64,%5
+SPRITE CONTINUE %121,,,%4 TO %5,%64,%5
 ENDPROC
 
 DEFPROC start()
@@ -269,8 +273,8 @@ ELSE IF %x<(w+1280):%w+=%j
 ELSE %w-=%j:%i=%9
 ENDIF
 #; Portal check - warp to other side of the screen
-IF %w<32 THEN %w=%2488
-IF %w > 2488 THEN %w=%32
+IF %w<104 THEN %w=%2304
+IF %w > 2304 THEN %w=%104
 SPRITE %7,%w>>3,%y,,%i
 ENDPROC
 
@@ -300,8 +304,8 @@ IF %u=2 THEN PROC fire() : ELSE PROC boost()
 ENDIF
 
 #; X-Pos bounds check, warp to otherside of screen
-IF %x<32 THEN %x=%2488
-IF %x > 2488 THEN %x=%32
+IF %x<104 THEN %x=%2304
+IF %x > 2304 THEN %x=%104
 SPRITE %9,%x >> 3,%y,,%z
 ENDPROC
 
