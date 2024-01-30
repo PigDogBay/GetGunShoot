@@ -281,10 +281,19 @@ DEFPROC zSpawn()
 PROC zomState(zSpew)
 ENDPROC
 
-DEFPROC zInitSpew():ENDPROC
+DEFPROC zInitSpew()
+#;Counter to animate the spew
+%o=5
+ENDPROC
 
+#; Animates the spew at a slower rate than its movement
 #; Tracks the green star sprite spewed from the demon's mouth
 DEFPROC zSpew()
+%o-=%1
+IF %o=0: %o=10 : SPRITE CONTINUE %50,,,%9
+ELSE IF %o=5: SPRITE CONTINUE %50,,,%8
+ENDIF
+#; Check if the spew (y-value) has landed
 IF %SPRITE AT (50,1) > 140 THEN PROC zomState(zLanded): 
 ENDPROC
 
