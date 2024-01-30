@@ -46,7 +46,8 @@
 #; 9-10  Player
 #; 20    Shotgun blast
 #; 21    Gun Angel
-#; 
+#; 40    Grave Rat
+#; 50    Zombie spawn spew
 #; 
 #; 
 #; GAME STATES
@@ -63,7 +64,6 @@
 #; 2 player holding gun
 #; 3-19 firing state
 #; 20 - end of fired
-#; 
 #; 
 #; Zombie States
 #; 0 - Spawn
@@ -156,6 +156,11 @@ SPRITE CONTINUE %9,,,%56 TO %57,%$50,%3,%0
 #; Relative flags: 1 - Unified sprite
 SPRITE %7,%64,%y,%36,%0:
 SPRITE -8,%0,%16,%2,%1,%2
+
+#; Grave Rat
+#; Doesn't affect game play, just runs back and forth along the bottom of the screen
+SPRITE %40,%32+RND 200,%208,%18,%$9
+SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
 #; Place souls
 #; SPRITE %1,%32,%y,%26,%1
