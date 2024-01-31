@@ -8,8 +8,8 @@
 #; 
 #; %a - Fire button count, prevent user holding down fire
 #; %b - Pattern change counter
-#; %c - 
-#; %d - 
+#; %c - Soul state index, 1-5
+#; %d -
 #; %e - 
 #; %f - 
 #; %g - 
@@ -35,7 +35,7 @@
 #; score - Current score
 #; high - High score
 #; timer - Set with TIME
-#;
+#; %s[1-5] - Soul state array
 #;
 #; SPRITES
 #; -------
@@ -52,42 +52,52 @@
 #; 
 #; GAME STATES
 #; -----------
-#; Program states
-#; 0 sTitle
-#; 1 sStart 
-#; 2 sGame
-#; 3 sDie
+#; Program States
+#; 0 - sTitle
+#; 1 - sStart 
+#; 2 - sGame
+#; 3 - sDie
 #;
-#; Player states
-#; 0 pRun
-#; 1 pGun
-#; 2 pShoot
-#; 3 pDead
+#; Player States
+#; 0 - pRun
+#; 1 - pGun
+#; 2 - pShoot
+#; 3 - pDead
 #; 
 #; 
-#; Gun states
-#; 0 spawn, being dropped in
-#; 1 ready to be collected
-#; 2 player holding gun
+#; Gun States
+#; 0 - spawn, being dropped in
+#; 1 - ready to be collected
+#; 2 - player holding gun
 #; 3-19 firing state
 #; 20 - end of fired
 #; 
 #; Zombie States
-#; 0 - Spawn
-#; 1 - Spew
-#; 2 - Landed
-#; 3 - Hunt, walk towards the player
-#; 4 - Charge to player
-#; 5 - Eat player's brain
-#; 6 - Walk back and forth (player dead)
-#; 7 - Dead, zombie brains 'blowed' out by the player
+#; 0 - zSpawn
+#; 1 - zSpew
+#; 2 - zLanded
+#; 3 - zHunt, walk towards the player
+#; 4 - zCharge to player
+#; 5 - zBrain Eat player's brain
+#; 6 - zWalk back and forth (player dead)
+#; 7 - zDead, zombie brains 'blowed' out by the player
 #;
+#; Soul States
+#; 0 - xSpawn
+#; 1 - xSpew
+#; 2 - xFloat
+#; 3 - xFreed
+#; 4 - xGift
+#; 5 - xPop
+#; 6 - xBlood
+
 
 RUN AT 3
 #; Constants for states
 sTitle, sStart, sGame, sDie=0,1,2,3: timer=0
 zSpawn,zSpew,zLanded,zHunt,zCharge,zBrain,zWalk,zDead=0,1,2,3,4,5,6,7
 pRun,pGun,pShoot,pDead=0,1,2,3
+xSpawn,xSpew,xFloat,xFreed,xGift,xPop,xBlood=0,1,2,3,4,5,6
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
@@ -138,6 +148,9 @@ SPRITE %120,%16,%144,%4,%1,%0,%0,%1
 SPRITE %121,%288,%144,%4,%9,%0,%0,%1
 SPRITE CONTINUE %120,,,%4 TO %5,%64,%5
 SPRITE CONTINUE %121,,,%4 TO %5,%64,%5
+
+#; Soul state index
+%c=%1
 ENDPROC
 
 DEFPROC start()
@@ -170,15 +183,16 @@ SPRITE -8,%0,%16,%2,%1,%2
 SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
-#; Place souls
-#; SPRITE %1,%32,%y,%26,%1
-#; SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
-
 PROC pState(pRun)
 PROC zomState(zSpawn)
 ENDPROC
 
 DEFPROC game()
+#; Soul states, do 1 soul per loop
+ON %s(c): PROC xSpawn(): PROC xSpew(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
+#; Next soul, 1-5
+%c+=1: IF %c=6 THEN %c=1
+
 #; Only need to update the gun state as it is being dropped in
 IF %u=0 THEN PROC gunFly()
 #; Player state machine
@@ -433,6 +447,55 @@ ENDPROC
 
 DEFPROC zDead()
 %o-=1: IF %o=0 THEN PROC zomState(zSpawn)
+ENDPROC
+
+#; 0 - xSpawn
+#; 1 - xSpew
+#; 2 - xFloat
+#; 3 - xFreed
+#; 4 - xGift
+#; 5 - xPop
+#; 6 - xBlood
+DEFPROC soulState(%i)
+%s[c]=%i
+ON %i: PROC xInitSpawn():PROC xInitSpew():PROC xInitFloat():PROC xInitFreed():PROC xInitGift():PROC xInitPop():PROC xInitBlood()
+ENDPROC
+
+DEFPROC xInitSpawn()
+ENDPROC
+DEFPROC xSpawn()
+ENDPROC
+
+DEFPROC xInitSpew()
+ENDPROC
+DEFPROC xSpew()
+ENDPROC
+
+DEFPROC xInitFloat()
+#; SPRITE %1,%32,%y,%26,%1
+#; SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
+ENDPROC
+DEFPROC xFloat()
+ENDPROC
+
+DEFPROC xInitFreed()
+ENDPROC
+DEFPROC xFreed()
+ENDPROC
+
+DEFPROC xInitGift()
+ENDPROC
+DEFPROC xGift()
+ENDPROC
+
+DEFPROC xInitPop()
+ENDPROC
+DEFPROC xPop()
+ENDPROC
+
+DEFPROC xInitBlood()
+ENDPROC
+DEFPROC xBlood()
 ENDPROC
 
 
