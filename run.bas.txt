@@ -151,10 +151,17 @@ SPRITE CONTINUE %121,,,%4 TO %5,%64,%5
 
 #; Soul state index
 %c=%1
+#; Counter to space soul traps
+%o=%20
 ENDPROC
 
 DEFPROC start()
-PROC state(sGame)
+%o-=%1 : IF %o>0 THEN ENDPROC
+IF %c<6 THEN PROC soulState(xSpawn)
+%o=%20
+#; Use %c as a counter here to allow soul traps to reach the graves
+#; before starting play
+%c+=1: IF %c=10 THEN %c=1: PROC state(sGame)
 ENDPROC
 
 DEFPROC initGame()
@@ -183,11 +190,17 @@ SPRITE -8,%0,%16,%2,%1,%2
 SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
-PROC pState(pRun)
-PROC zomState(zSpawn)
+#; ----PROC pState(pRun)
+#; ----PROC zomState(zSpawn)
+ENDPROC
+DEFPROC game()
+#; Soul states, do 1 soul per loop
+ON %s(c): PROC xSpawn(): PROC xSpew(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
+#; Next soul, 1-5
+%c+=1: IF %c=6 THEN %c=1
 ENDPROC
 
-DEFPROC game()
+DEFPROC gameA()
 #; Soul states, do 1 soul per loop
 ON %s(c): PROC xSpawn(): PROC xSpew(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
 #; Next soul, 1-5
@@ -462,11 +475,23 @@ ON %i: PROC xInitSpawn():PROC xInitSpew():PROC xInitFloat():PROC xInitFreed():PR
 ENDPROC
 
 DEFPROC xInitSpawn()
+#; Random x position for zombie
+%i=%64+ RND 189
+SPRITE %c,%152,%98,%6,%1
+IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %240 STEP 1 STOP ,%6,%$41,%0,%0
+ELSE SPRITE CONTINUE %c,%152 TO %i STEP 2 RUN ,%96 TO %240 STEP 1 STOP ,%6,%$41,%0,%0
+ENDIF
 ENDPROC
+
 DEFPROC xSpawn()
+#; Check if the spawn (y-value) has landed
+IF %SPRITE AT (c,1) > 200 THEN PROC soulState(zSpew): 
+
 ENDPROC
 
 DEFPROC xInitSpew()
+beep .1,1
+SPRITE PAUSE %c: SPRITE %c,,,,%0
 ENDPROC
 DEFPROC xSpew()
 ENDPROC
