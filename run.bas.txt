@@ -56,8 +56,8 @@
 #; Player states
 #; 0 pRun
 #; 1 pGun
-#; 2 PShoot
-#; 3 PDead
+#; 2 pShoot
+#; 3 pDead
 #; 
 #;
 #; 0 sTitle
