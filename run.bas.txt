@@ -52,6 +52,11 @@
 #; 
 #; GAME STATES
 #; -----------
+#; Program states
+#; 0 sTitle
+#; 1 sStart 
+#; 2 sGame
+#; 3 sDie
 #;
 #; Player states
 #; 0 pRun
@@ -59,11 +64,6 @@
 #; 2 pShoot
 #; 3 pDead
 #; 
-#;
-#; 0 sTitle
-#; 1 sStart 
-#; 2 sGame
-#; 3 sDie
 #; 
 #; Gun states
 #; 0 spawn, being dropped in
