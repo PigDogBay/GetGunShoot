@@ -87,8 +87,7 @@
 #; 1 - xFloat
 #; 2 - xFreed
 #; 3 - xGift
-#; 4 - xPop
-#; 5 - xBlood
+#; 4 - xBlood
 
 
 RUN AT 3
@@ -96,7 +95,7 @@ RUN AT 3
 sTitle, sStart, sGame, sDie=0,1,2,3: timer=0
 zSpawn,zSpew,zLanded,zHunt,zCharge,zBrain,zWalk,zDead=0,1,2,3,4,5,6,7
 pRun,pGun,pShoot,pDead=0,1,2,3
-xSpawn,xFloat,xFreed,xGift,xPop,xBlood=0,1,2,3,4,5
+xSpawn,xFloat,xFreed,xGift,xBlood=0,1,2,3,4
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
@@ -194,14 +193,14 @@ SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0
 ENDPROC
 DEFPROC game()
 #; Soul states, do 1 soul per loop
-ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
+ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xBlood()
 #; Next soul, 1-5
 %c+=1: IF %c=6 THEN %c=1
 ENDPROC
 
 DEFPROC gameA()
 #; Soul states, do 1 soul per loop
-ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
+ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xBlood()
 #; Next soul, 1-5
 %c+=1: IF %c=6 THEN %c=1
 
@@ -462,15 +461,13 @@ DEFPROC zDead()
 ENDPROC
 
 #; 0 - xSpawn
-#; 1 - xSpew
-#; 2 - xFloat
-#; 3 - xFreed
-#; 4 - xGift
-#; 5 - xPop
-#; 6 - xBlood
+#; 1 - xFloat
+#; 2 - xFreed
+#; 3 - xGift
+#; 4 - xBlood
 DEFPROC soulState(%i)
 %s[c]=%i
-ON %i: PROC xInitSpawn():PROC xInitFloat():PROC xInitFreed():PROC xInitGift():PROC xInitPop():PROC xInitBlood()
+ON %i: PROC xInitSpawn():PROC xInitFloat():PROC xInitFreed():PROC xInitGift():PROC xInitBlood()
 ENDPROC
 
 DEFPROC xInitSpawn()
@@ -494,7 +491,7 @@ SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%26 TO %27,%$3,%2,%50+RND 100
 ENDPROC
 
 DEFPROC xFloat()
-IF % NOT SPRITE c THEN PROC soulState(xSpawn)
+IF % NOT SPRITE c THEN PROC soulState(xBlood)
 ENDPROC
 
 DEFPROC xInitFreed()
@@ -507,14 +504,12 @@ ENDPROC
 DEFPROC xGift()
 ENDPROC
 
-DEFPROC xInitPop()
-ENDPROC
-DEFPROC xPop()
-ENDPROC
-
 DEFPROC xInitBlood()
+SPRITE %c,,,%28,%1
+SPRITE CONTINUE %c,STOP,%60 TO %240 STEP 1 RUN,%28 TO %29,%$3,%0,%0
 ENDPROC
 DEFPROC xBlood()
+IF % NOT SPRITE c THEN PROC soulState(xSpawn)
 ENDPROC
 
 
