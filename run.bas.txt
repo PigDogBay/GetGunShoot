@@ -387,8 +387,8 @@ SPRITE %7,,,,%0:
 #; Random x position for zombie
 %w=%64+ RND 189
 SPRITE %50,%152,%98,%8,%1
-IF %w < 152: SPRITE CONTINUE %50,%w TO %153 STEP -1 RUN ,%96 TO %y STEP 1 RUN ,%8,%$42,%0,%0
-ELSE SPRITE CONTINUE %50,%152 TO %w STEP 1 RUN ,%96 TO %y STEP 1 RUN ,%8,%$42,%0,%0
+IF %w < 152: SPRITE CONTINUE %50,%w TO %153 STEP -1 RUN ,%96 TO %y STEP 1 STOP ,%8,%$41,%0,%0
+ELSE SPRITE CONTINUE %50,%152 TO %w STEP 1 RUN ,%96 TO %y STEP 1 STOP ,%8,%$41,%0,%0
 ENDIF
 #; Multiply x position by 8 for sub-pixel positioning
 %w=%w << 3
