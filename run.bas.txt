@@ -315,11 +315,9 @@ DEFPROC pInitDead()
 #; Change player pattern to death throw
 SPRITE %9,,,%48
 SPRITE CONTINUE %9,,,%48 TO %49,%$40,%10,%0
-#; Zombie run off with brain
-SPRITE %7,,,%44,%1
-SPRITE CONTINUE %7,%40 TO %240 STEP 1 RUN ,%y,%44 TO %45,%8,%10
 ENDPROC
 DEFPROC pDead()
+PROC zomState(zBrain)
 PROC state(sDie)
 ENDPROC
 
@@ -456,7 +454,7 @@ ENDPROC
 #; Zombie slowly walks away happily eating your brain
 DEFPROC zInitBrain()
 SPRITE %7,%w>>3,%y,%44,%1
-SPRITE CONTINUE %7,%40 TO %240 STEP %1 RUN,%y,%44 TO %45,%8,%10
+SPRITE CONTINUE %7,%32 TO %256 STEP %1 RUN,%y,%44 TO %45,%8,%10
 ENDPROC
 DEFPROC zBrain():ENDPROC
 
