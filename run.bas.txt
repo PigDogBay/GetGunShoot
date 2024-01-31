@@ -46,6 +46,7 @@
 #; 9-10  Player
 #; 20    Shotgun blast
 #; 21    Gun Angel
+#; 22    Boost bonus
 #; 40    Grave Rat
 #; 50    Zombie spawn spew
 #; 
@@ -365,6 +366,14 @@ DEFPROC boost()
 IF %q=0 AND (n>0) THEN %q=20:%n-=%1
 ENDPROC
 
+DEFPROC addBoost()
+BEEP .1,10
+IF %n < 10 THEN %n+=%1
+#; Zoosh a speed sprite to the top right
+SPRITE %22,%x>>3,%y,%10,%1
+SPRITE CONTINUE %22,%0 TO %319 STEP 4 RUN, %0 TO %200 STEP -4 RUN, %10,%3,%0,%0
+ENDPROC
+
 #;
 #; Enter new Zombie state
 #;
@@ -492,7 +501,7 @@ DEFPROC xSpawn()
 IF %SPRITE AT (c,1) > 200 THEN PROC soulState(xFloat): ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p <> 3) THEN PROC soulState(xTrap)
+IF %i=9 AND (p < 3) THEN PROC soulState(xTrap)
 ENDPROC
 
 DEFPROC xInitFloat()
@@ -504,17 +513,27 @@ DEFPROC xFloat()
 IF % NOT SPRITE c THEN PROC soulState(xBlood): ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p <> 3) THEN PROC soulState(xFreed)
+IF %i=9 AND (p < 3) THEN PROC soulState(xFreed)
 ENDPROC
 
 DEFPROC xInitFreed()
+#; Send an Angel up to heaven
+SPRITE %c,,,%22,%1
+SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%22 TO %23,%$3,%0,%0
 ENDPROC
 DEFPROC xFreed()
+IF % NOT SPRITE c THEN PROC soulState(xGift): ENDPROC
 ENDPROC
 
 DEFPROC xInitGift()
+#; Send a speed boost down to the player
+SPRITE %c,,,%10,%1
+SPRITE CONTINUE %c,STOP,%60 TO %y STEP 1 RUN,%10 TO %11,%$2,%0,%0
 ENDPROC
 DEFPROC xGift()
+#; Check if hit player sprite and player is not dead
+%i= SPRITE OVER (%c,%9,%7)
+IF %i=9 AND (p < 3) THEN PROC addBoost():PROC soulState(xSpawn)
 ENDPROC
 
 DEFPROC xInitBlood()
@@ -525,7 +544,7 @@ DEFPROC xBlood()
 IF % NOT SPRITE c THEN PROC soulState(xSpawn) : ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p <> 3) AND (d=0) THEN %d=16
+IF %i=9 AND (p < 3) AND (d=0) THEN %d=16
 ENDPROC
 
 DEFPROC xInitTrap()
