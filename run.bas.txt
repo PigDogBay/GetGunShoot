@@ -167,48 +167,28 @@ SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0
 #; SPRITE %1,%32,%y,%26,%1
 #; SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
 
-PROC gunSpawn()
+PROC pState(pRun)
 PROC zomState(zSpawn)
 ENDPROC
 
 DEFPROC game()
-#; Gun states
-#; 0 spawn, being dropped in
-#; 1 ready to be collected
-#; 2 player holding gun
-#; 3-19 firing state
-#; 20 - end of fired
-IF %u=0: PROC gunFly()
-ELSE IF %u=20: SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57:PROC gunSpawn()
-ELSE IF %u>2: %u+=1
-ENDIF
-
+#; Only need to update the gun state as it is being dropped in
+IF %u=0 THEN PROC gunFly()
+#; Player state machine
+on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead()
 #; Zombie state machine
-on %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
-
-PROC player()
+ON %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%1 TO %7,%7) 
-IF %i=6: PROC getGun()
-#; Only kill player if zombie is active
-ELSE IF %i=7 AND (r<>7): PROC state(sDie)
+IF %i=6: PROC pState(pGun)
+#; Only kill player if zombie is active and player not already dead
+ELSE IF %i=7 AND (r<>7) AND (p<>4): PROC pState(pDead)
 ENDIF
-
-#; Check if zombie shot
-%i= SPRITE OVER (%20,%7,%7)
-IF %i=7 THEN PROC zomState(zDead)
 
 ENDPROC
 
 DEFPROC initDie()
-#; Change player pattern to death throw
-SPRITE %9,,,%48
-SPRITE CONTINUE %9,,,%48 TO %49,%$40,%10,%0
-#; Zombie run off with brain
-SPRITE %7,,,%44,%1
-SPRITE CONTINUE %7,%40 TO %240 STEP 1 RUN ,%y,%44 TO %45,%8,%10
-
 timer = TIME
 LAYER %0: PRINT AT %13,%12;INK 2;"Game Over"
 DRIVER %49,%2,%56
@@ -223,8 +203,6 @@ IF (TIME-timer)< 100 THEN ENDPROC
 %i = INPUT 1| INPUT 0
 IF %i&$10 THEN PROC state(sTitle)
 ENDPROC
-
-
 
 
 DEFPROC gunSpawn()
@@ -247,19 +225,6 @@ SPRITE PAUSE %6:SPRITE %6,,%y,%24,%1:SPRITE CONTINUE %6,STOP,STOP,%24 TO %25,%$5
 %u=1
 ENDPROC
 
-#; Player has walked over the gun
-#; Change player sprite to holding the gun
-#; Remove the gun sprite
-DEFPROC getGun()
-#; Remove Gun
-SPRITE %6,,,,%0
-#; Change player pattern
-SPRITE %9,,,%52
-SPRITE CONTINUE %9,,,%52 TO %53
-#; Update gun state to collected
-%u=2
-ENDPROC
-
 #;
 #; Enter new player state 
 #;
@@ -269,25 +234,96 @@ ON %p: PROC pInitRun():PROC pInitGun():PROC pInitShoot():PROC pInitDead()
 ENDPROC
 
 DEFPROC pInitRun()
-ENDPROC
-DEFPROC pRun()
+SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57
+PROC gunSpawn()
 ENDPROC
 
+#; Player has walked over the gun
+#; Change player sprite to holding the gun
+#; Remove the gun sprite
 DEFPROC pInitGun()
-ENDPROC
-DEFPROC pGun()
+#; Change player pattern to holding the gun
+SPRITE %9,,,%52
+SPRITE CONTINUE %9,,,%52 TO %53
+#; Remove Gun
+SPRITE %6,,,,%0
+#; Update gun state to collected
+%u=2
 ENDPROC
 
 DEFPROC pInitShoot()
+#; Set gun state to shooting
+%u=3
+%i= %x>>3
+IF %z=1:
+#;  Shoot right
+%j=%i+8:IF %j>319 THEN %j=319
+SPRITE %20,%j,%y+8,%0,%1
+#; Flags %3 - stop and become invisible
+%j=%i+40:IF %j>319 THEN %j=319
+SPRITE CONTINUE %20,%0 TO %j STEP 4 RUN ,%y+8,%0 TO %3,%3
+ELSE
+#;  Shoot Left
+%j=%i-8:IF %j>319 THEN %j=0
+SPRITE %20,%j,%y+8,%0,%1
+#; Flags %3 - stop and become invisible
+%j=%i-40:IF %j>319 THEN %j=0
+SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
+ENDIF
 ENDPROC
+
 DEFPROC pShoot()
+PROC pMove()
+#; Check if zombie shot
+%i= SPRITE OVER (%20,%7,%7)
+IF %i=7 THEN PROC zomState(zDead)
+#;Increase counter and return to pRun state when expired
+IF %u=20 THEN PROC pState(pRun): ELSE %u+=1
+ENDIF
+
 ENDPROC
 
 DEFPROC pInitDead()
+#; Change player pattern to death throw
+SPRITE %9,,,%48
+SPRITE CONTINUE %9,,,%48 TO %49,%$40,%10,%0
+#; Zombie run off with brain
+SPRITE %7,,,%44,%1
+SPRITE CONTINUE %7,%40 TO %240 STEP 1 RUN ,%y,%44 TO %45,%8,%10
 ENDPROC
 DEFPROC pDead()
+PROC state(sDie)
 ENDPROC
 
+
+DEFPROC pMove()
+%i= INPUT 1| INPUT 0
+#; Update x position of player and direction they are facing
+#; Apply any speed boost to the player
+IF %i&1 THEN %x+=%8+q:%z=1
+IF %i&2 THEN %x-=%8+q:%z=9
+IF %q > 0 THEN %q-=%1
+#; Prevent user holding down the fire button, %a - button press down counts
+#; Only fire when %a=1, resets to 0 when player releases the fire button
+IF %i&$10 THEN %a+=1 : ELSE %a=0
+#; Fire Mode depends on player state
+#; Run (%p=0) - Boost
+#; Run (%p=1) - Shoot
+IF %a=1:%a+=%1
+IF %p=0 THEN PROC boost() : ELSE PROC pState(pShoot)
+ENDIF
+
+#; X-Pos bounds check, warp to otherside of screen
+IF %x<104 THEN %x=%2304
+IF %x > 2304 THEN %x=%104
+SPRITE %9,%x >> 3,%y,,%z
+ENDPROC
+
+#; %q Speed boost counter
+#; %n Number of speed boosts available to the player 
+DEFPROC boost()
+IF %q=0 AND (n>0) THEN %q=20:%n-=%1
+ENDPROC
 
 #;
 #; Enter new Zombie state
@@ -340,7 +376,7 @@ ENDPROC
 DEFPROC zLanded()
 #; Check if player is holding the gun
 #; TODO, player maybe dead to so need to walk aimlessly
-IF %u=2 THEN PROC zomState(zCharge): ELSE PROC zomState(zHunt)
+IF %p=1 THEN PROC zomState(zCharge): ELSE PROC zomState(zHunt)
 ENDPROC
 
 DEFPROC zInitHunt()
@@ -392,58 +428,6 @@ DEFPROC zDead()
 %o-=1: IF %o=0 THEN PROC zomState(zSpawn)
 ENDPROC
 
-
-DEFPROC player()
-%i= INPUT 1| INPUT 0
-#; Update x position of player and direction they are facing
-#; Apply any speed boost to the player
-IF %i&1 THEN %x+=%8+q:%z=1
-IF %i&2 THEN %x-=%8+q:%z=9
-IF %q > 0 THEN %q-=%1
-#; Prevent user holding down the fire button, %a - button press down counts
-#; Only fire when %a=1, resets to 0 when player releases the fire button
-IF %i&$10 THEN %a+=1 : ELSE %a=0
-IF %a=1:%a+=%1
-#; Can only fire if you have the gun and has not already been fired(%u gun state)
-#; If not holding the gun then apply a speed boost to the player
-IF %u=2 THEN PROC fire() : ELSE PROC boost()
-ENDIF
-
-#; X-Pos bounds check, warp to otherside of screen
-IF %x<104 THEN %x=%2304
-IF %x > 2304 THEN %x=%104
-SPRITE %9,%x >> 3,%y,,%z
-ENDPROC
-
-#; %q Speed boost counter
-#; %n Number of speed boosts available to the player 
-DEFPROC boost()
-IF %q=0 AND (n>0) THEN %q=20:%n-=%1
-ENDPROC
-
-#; 
-#; *** PLAYER FIRE ***
-#; 
-DEFPROC fire()
-#; Set gun state to fired
-%u=%3
-%i= %x>>3
-IF %z=1:
-#;  Shoot right
-%j=%i+8:IF %j>319 THEN %j=319
-SPRITE %20,%j,%y+8,%0,%1
-#; Flags %3 - stop and become invisible
-%j=%i+40:IF %j>319 THEN %j=319
-SPRITE CONTINUE %20,%0 TO %j STEP 4 RUN ,%y+8,%0 TO %3,%3
-ELSE
-#;  Shoot Left
-%j=%i-8:IF %j>319 THEN %j=0
-SPRITE %20,%j,%y+8,%0,%1
-#; Flags %3 - stop and become invisible
-%j=%i-40:IF %j>319 THEN %j=0
-SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
-ENDIF
-ENDPROC 
 
 #; 
 #; *** INITIALIZE GRAPHICS ***
