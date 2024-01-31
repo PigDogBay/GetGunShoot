@@ -53,6 +53,13 @@
 #; GAME STATES
 #; -----------
 #;
+#; Player states
+#; 0 pRun
+#; 1 pGun
+#; 2 PShoot
+#; 3 PDead
+#; 
+#;
 #; 0 sTitle
 #; 1 sStart 
 #; 2 sGame
