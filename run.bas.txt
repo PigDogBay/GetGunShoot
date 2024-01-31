@@ -188,17 +188,11 @@ SPRITE -8,%0,%16,%2,%1,%2
 SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
-#; ----PROC pState(pRun)
-#; ----PROC zomState(zSpawn)
-ENDPROC
-DEFPROC game()
-#; Soul states, do 1 soul per loop
-ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xBlood()
-#; Next soul, 1-5
-%c+=1: IF %c=6 THEN %c=1
+PROC pState(pRun)
+#; -- PROC zomState(zSpawn)
 ENDPROC
 
-DEFPROC gameA()
+DEFPROC game()
 #; Soul states, do 1 soul per loop
 ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xBlood()
 #; Next soul, 1-5
@@ -209,7 +203,7 @@ IF %u=0 THEN PROC gunFly()
 #; Player state machine
 on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead()
 #; Zombie state machine
-ON %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
+#; -- ON %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%1 TO %7,%7) 
