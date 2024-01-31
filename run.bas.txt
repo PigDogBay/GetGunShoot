@@ -63,7 +63,7 @@
 #; 1 - pGun
 #; 2 - pShoot
 #; 3 - pDead
-#; 
+#; 4 - pCaught (Dead)
 #; 
 #; Gun States
 #; 0 - spawn, being dropped in
@@ -95,7 +95,7 @@ RUN AT 3
 #; Constants for states
 sTitle, sStart, sGame, sDie=0,1,2,3: timer=0
 zSpawn,zSpew,zLanded,zHunt,zCharge,zBrain,zWalk,zDead=0,1,2,3,4,5,6,7
-pRun,pGun,pShoot,pDead=0,1,2,3
+pRun,pGun,pShoot,pDead,pCaught=0,1,2,3,4
 xSpawn,xFloat,xFreed,xGift,xBlood,xTrap=0,1,2,3,4,5
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
@@ -202,7 +202,7 @@ ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xBlood
 #; Only need to update the gun state as it is being dropped in
 IF %u=0 THEN PROC gunFly()
 #; Player state machine
-on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead()
+on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead():PROC pCaught()
 #; Zombie state machine
 #; -- ON %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
 
@@ -210,7 +210,7 @@ on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead()
 %i = SPRITE OVER (%9,%6 TO %7,%7) 
 IF %i=6: PROC pState(pGun)
 #; Only kill player if zombie is active and player not already dead
-ELSE IF %i=7 AND (r<>7) AND (p<>4): PROC pState(pDead)
+ELSE IF %i=7 AND (r<>7) AND (p<3): PROC pState(pDead)
 ENDIF
 
 ENDPROC
@@ -257,7 +257,7 @@ ENDPROC
 #;
 DEFPROC pState(newState)
 %p = newState
-ON %p: PROC pInitRun():PROC pInitGun():PROC pInitShoot():PROC pInitDead() 
+ON %p: PROC pInitRun():PROC pInitGun():PROC pInitShoot():PROC pInitDead() :PROC pInitCaught() 
 ENDPROC
 
 DEFPROC pInitRun()
@@ -322,6 +322,16 @@ DEFPROC pDead()
 PROC state(sDie)
 ENDPROC
 
+DEFPROC pInitCaught()
+#; Turn off player sprite
+SPRITE %9,,,,%0
+#; Zombie run walk aimlessly if around
+#;SPRITE %7,,,%44,%1
+#;SPRITE CONTINUE %7,%40 TO %240 STEP 1 RUN ,%y,%44 TO %45,%8,%10
+ENDPROC
+DEFPROC pCaught()
+PROC state(sDie)
+ENDPROC
 
 DEFPROC pMove()
 %i= INPUT 1| INPUT 0
@@ -498,7 +508,6 @@ IF %i=9 AND (p <> 3) THEN PROC soulState(xFreed)
 ENDPROC
 
 DEFPROC xInitFreed()
-BEEP.1,1
 ENDPROC
 DEFPROC xFreed()
 ENDPROC
@@ -520,9 +529,12 @@ IF %i=9 AND (p <> 3) AND (d=0) THEN %d=16
 ENDPROC
 
 DEFPROC xInitTrap()
-BEEP .1,-10
+SPRITE %c,,,%26,%1
+SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%26 TO %27,%$3,%4,%50+RND 100
+PROC pState(pCaught)
 ENDPROC
 DEFPROC xTrap()
+IF % NOT SPRITE c THEN PROC soulState(xBlood): ENDPROC
 ENDPROC
 
 
