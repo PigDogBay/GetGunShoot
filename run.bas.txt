@@ -84,12 +84,11 @@
 #;
 #; Soul States
 #; 0 - xSpawn
-#; 1 - xSpew
-#; 2 - xFloat
-#; 3 - xFreed
-#; 4 - xGift
-#; 5 - xPop
-#; 6 - xBlood
+#; 1 - xFloat
+#; 2 - xFreed
+#; 3 - xGift
+#; 4 - xPop
+#; 5 - xBlood
 
 
 RUN AT 3
@@ -97,7 +96,7 @@ RUN AT 3
 sTitle, sStart, sGame, sDie=0,1,2,3: timer=0
 zSpawn,zSpew,zLanded,zHunt,zCharge,zBrain,zWalk,zDead=0,1,2,3,4,5,6,7
 pRun,pGun,pShoot,pDead=0,1,2,3
-xSpawn,xSpew,xFloat,xFreed,xGift,xPop,xBlood=0,1,2,3,4,5,6
+xSpawn,xFloat,xFreed,xGift,xPop,xBlood=0,1,2,3,4,5
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
 
 #;-----------------------------
@@ -195,14 +194,14 @@ SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0
 ENDPROC
 DEFPROC game()
 #; Soul states, do 1 soul per loop
-ON %s(c): PROC xSpawn(): PROC xSpew(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
+ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
 #; Next soul, 1-5
 %c+=1: IF %c=6 THEN %c=1
 ENDPROC
 
 DEFPROC gameA()
 #; Soul states, do 1 soul per loop
-ON %s(c): PROC xSpawn(): PROC xSpew(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
+ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xPop(): PROC xBlood()
 #; Next soul, 1-5
 %c+=1: IF %c=6 THEN %c=1
 
@@ -471,36 +470,31 @@ ENDPROC
 #; 6 - xBlood
 DEFPROC soulState(%i)
 %s[c]=%i
-ON %i: PROC xInitSpawn():PROC xInitSpew():PROC xInitFloat():PROC xInitFreed():PROC xInitGift():PROC xInitPop():PROC xInitBlood()
+ON %i: PROC xInitSpawn():PROC xInitFloat():PROC xInitFreed():PROC xInitGift():PROC xInitPop():PROC xInitBlood()
 ENDPROC
 
 DEFPROC xInitSpawn()
 #; Random x position for zombie
 %i=%64+ RND 189
 SPRITE %c,%152,%98,%6,%1
-IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %240 STEP 1 STOP ,%6,%$41,%0,%0
-ELSE SPRITE CONTINUE %c,%152 TO %i STEP 2 RUN ,%96 TO %240 STEP 1 STOP ,%6,%$41,%0,%0
+IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %230 STEP 1 STOP ,%6,%$41,%0,%0
+ELSE SPRITE CONTINUE %c,%152 TO %i STEP 2 RUN ,%96 TO %230 STEP 1 STOP ,%6,%$41,%0,%0
 ENDIF
 ENDPROC
 
 DEFPROC xSpawn()
 #; Check if the spawn (y-value) has landed
-IF %SPRITE AT (c,1) > 200 THEN PROC soulState(zSpew): 
+IF %SPRITE AT (c,1) > 200 THEN PROC soulState(xFloat): 
 
-ENDPROC
-
-DEFPROC xInitSpew()
-beep .1,1
-SPRITE PAUSE %c: SPRITE %c,,,,%0
-ENDPROC
-DEFPROC xSpew()
 ENDPROC
 
 DEFPROC xInitFloat()
-#; SPRITE %1,%32,%y,%26,%1
-#; SPRITE CONTINUE %1,,,%26 TO %27,%$50,%4,%0
+SPRITE %c,,,%26,%1
+SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%26 TO %27,%$3,%2,%50+RND 100
 ENDPROC
+
 DEFPROC xFloat()
+IF % NOT SPRITE c THEN PROC soulState(xSpawn)
 ENDPROC
 
 DEFPROC xInitFreed()
