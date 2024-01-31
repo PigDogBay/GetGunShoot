@@ -9,7 +9,7 @@
 #; %a - Fire button count, prevent user holding down fire
 #; %b - Pattern change counter
 #; %c - Soul state index, 1-5
-#; %d -
+#; %d - Debuff - slow player down
 #; %e - 
 #; %f - 
 #; %g - 
@@ -327,9 +327,12 @@ DEFPROC pMove()
 %i= INPUT 1| INPUT 0
 #; Update x position of player and direction they are facing
 #; Apply any speed boost to the player
-IF %i&1 THEN %x+=%8+q:%z=1
-IF %i&2 THEN %x-=%8+q:%z=9
+IF %i&1 THEN %x+=%8+q-d:%z=1
+IF %i&2 THEN %x-=%8+q-d:%z=9
+#; Fade out speed boost
 IF %q > 0 THEN %q-=%1
+#; Fade out speed debuff
+IF %d > 0 THEN %d-=%1
 #; Prevent user holding down the fire button, %a - button press down counts
 #; Only fire when %a=1, resets to 0 when player releases the fire button
 IF %i&$10 THEN %a+=1 : ELSE %a=0
@@ -513,7 +516,7 @@ DEFPROC xBlood()
 IF % NOT SPRITE c THEN PROC soulState(xSpawn) : ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p <> 3) THEN BEEP .1,10
+IF %i=9 AND (p <> 3) AND (d=0) THEN %d=16
 ENDPROC
 
 DEFPROC xInitTrap()
