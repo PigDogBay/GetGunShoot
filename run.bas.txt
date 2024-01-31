@@ -191,7 +191,7 @@ SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
 PROC pState(pRun)
-#; -- PROC zomState(zSpawn)
+PROC zomState(zSpawn)
 ENDPROC
 
 DEFPROC game()
@@ -205,7 +205,7 @@ IF %u=0 THEN PROC gunFly()
 #; Player state machine
 on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead():PROC pCaught()
 #; Zombie state machine
-#; -- ON %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
+ON %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%6 TO %7,%7) 
@@ -491,7 +491,7 @@ DEFPROC xInitSpawn()
 #; Random x position for soul
 %i=%64+ RND 189
 SPRITE %c,%152,%98,%6,%1
-IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %230 STEP 1 RUN ,%6,%$42,%0,%0
+IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %230 STEP 1 RUN ,%6,%$43,%0,%0
 ELSE SPRITE CONTINUE %c,%152 TO %i STEP 2 RUN ,%96 TO %230 STEP 1 RUN ,%6,%$42,%0,%0
 ENDIF
 ENDPROC
