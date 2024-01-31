@@ -492,8 +492,8 @@ DEFPROC xInitSpawn()
 %i=%64+ RND 189
 SPRITE %c,%152,%98,%6,%1
 #; Travel horizontal then drop, this makes it easier for the player to dodge the trap
-IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %230 STEP 1 RUN ,%6,%$43,%0,%0
-ELSE SPRITE CONTINUE %c,%152 TO %i STEP 2 RUN ,%96 TO %230 STEP 1 RUN ,%6,%$42,%0,%0
+IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %230 STEP 1 STOP ,%6,%$41,%0,%0
+ELSE SPRITE CONTINUE %c,%152 TO %i STEP 2 RUN ,%96 TO %230 STEP 1 STOP ,%6,%$41,%0,%0
 ENDIF
 ENDPROC
 
