@@ -372,8 +372,8 @@ IF %p=0 THEN PROC boost() : ELSE PROC pState(pShoot)
 ENDIF
 
 #; X-Pos bounds check, warp to otherside of screen
-IF %x<104 THEN %x=%2304
-IF %x > 2304 THEN %x=%104
+IF %x<104 THEN %x=%2304: %q = 16
+IF %x > 2304 THEN %x=%104: %q = 16
 SPRITE %9,%x >> 3,%y,,%z
 ENDPROC
 
