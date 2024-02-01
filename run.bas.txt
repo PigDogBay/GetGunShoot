@@ -50,7 +50,8 @@
 #; 22    Boost bonus
 #; 40    Grave Rat
 #; 50    Zombie spawn spew
-#; 61-69 Boosts
+#; 61-69 HUD Boosts
+#; 70-75 HUD Lives
 #; 
 #; GAME STATES
 #; -----------
@@ -144,7 +145,7 @@ ENDPROC
 
 DEFPROC initStart()
 PROC initGraphics("play.sl2")
-score=0
+lives,score=3,0
 PROC score(): PROC hiScore()
 SPRITE %120,%16,%144,%4,%1,%0,%0,%1
 SPRITE %121,%288,%144,%4,%9,%0,%0,%1
@@ -186,7 +187,7 @@ SPRITE -8,%0,%16,%2,%1,%2
 SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
-PROC hudBoosts()
+PROC hudBoosts():PROC lives()
 
 PROC pState(pRun)
 PROC zomState(zSpew)
@@ -621,8 +622,12 @@ IF %t(c)=0 THEN PROC soulState(xSpawn)
 ENDPROC
 
 DEFPROC hudBoosts()
-FOR %i=%1 TO %n :SPRITE %60+i,%i*18 + 16,%230,%10,%1:NEXT %i
-FOR %i=%n+1 TO %9:SPRITE %60+i,%0,%0,%8,%0:NEXT %i
+FOR %i=%1 TO %n :SPRITE %60+i,%290-(i*18),%230,%10,%1:NEXT %i
+FOR %i=%n+1 TO %9:SPRITE %60+i,,,,%0:NEXT %i
+ENDPROC
+DEFPROC lives()
+FOR %i=%2 TO lives :SPRITE %70+i,%(i*18) -8,%230,%56,%1:NEXT %i
+FOR %i=lives+1 TO %5:SPRITE %70+i,,,,%0:NEXT %i
 ENDPROC
 
 
