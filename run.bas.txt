@@ -263,6 +263,8 @@ ENDPROC
 DEFPROC pInitRun()
 SPRITE %9,,,%56: SPRITE CONTINUE %9,,,%56 TO %57
 PROC gunSpawn()
+#;Update the zombie state (if charging) to hunting
+IF %r=3 THEN PROC zomState(zHunt)
 ENDPROC
 
 #; Player has walked over the gun
@@ -299,8 +301,6 @@ SPRITE %20,%j,%y+8,%0,%1
 %j=%i-40:IF %j>319 THEN %j=0
 SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
 ENDIF
-#;Update the zombie state (if charging) to hunting
-IF %r=3 THEN PROC zomState(zHunt)
 ENDPROC
 
 DEFPROC pShoot()
