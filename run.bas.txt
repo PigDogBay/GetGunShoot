@@ -74,14 +74,13 @@
 #; 20 - end of fired
 #; 
 #; Zombie States
-#; 0 - zSpawn
-#; 1 - zSpew
-#; 2 - zLanded
-#; 3 - zHunt, walk towards the player
-#; 4 - zCharge to player
-#; 5 - zBrain Eat player's brain
-#; 6 - zWalk back and forth (player dead)
-#; 7 - zDead, zombie brains 'blowed' out by the player
+#; 0 - zSpew
+#; 1 - zLanded
+#; 2 - zHunt, walk towards the player
+#; 3 - zCharge to player
+#; 4 - zBrain Eat player's brain
+#; 5 - zWalk back and forth (player dead)
+#; 6 - zDead, zombie brains 'blowed' out by the player
 #;
 #; Soul States
 #; 0 - xSpawn
@@ -95,7 +94,7 @@
 RUN AT 3
 #; Constants for states
 sTitle, sStart, sGame, sDie=0,1,2,3: timer=0
-zSpawn,zSpew,zLanded,zHunt,zCharge,zBrain,zWalk,zDead=0,1,2,3,4,5,6,7
+zSpew,zLanded,zHunt,zCharge,zBrain,zWalk,zDead=0,1,2,3,4,5,6
 pRun,pGun,pShoot,pDead,pCaught=0,1,2,3,4
 xSpawn,xFloat,xFreed,xGift,xBlood,xTrap=0,1,2,3,4,5
 PROC initSnd():PROC font(): PROC loadHS() TO high :PROC state(sTitle)
@@ -191,7 +190,7 @@ SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
 PROC pState(pRun)
-PROC zomState(zSpawn)
+PROC zomState(zSpew)
 ENDPROC
 
 DEFPROC game()
@@ -205,13 +204,13 @@ IF %u=0 THEN PROC gunFly()
 #; Player state machine
 on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead():PROC pCaught()
 #; Zombie state machine
-ON %r: PROC zSpawn(): PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
+ON %r: PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
 
 #; *** COLLISION DETECTION ***
 %i = SPRITE OVER (%9,%6 TO %7,%7) 
 IF %i=6: PROC pState(pGun)
 #; Only kill player if zombie is active and player not already dead
-ELSE IF %i=7 AND (r<>7) AND (p<3): PROC pState(pDead)
+ELSE IF %i=7 AND (r<>6) AND (p<3): PROC pState(pDead)
 ENDIF
 
 ENDPROC
@@ -377,10 +376,10 @@ ENDPROC
 #;
 DEFPROC zomState(newState)
 %r = newState
-ON %r: PROC zInitSpawn(): PROC zInitSpew(): PROC zInitLanded(): PROC zInitHunt(): PROC zInitCharge(): PROC zInitBrain(): PROC zInitWalk(): PROC zInitDead()
+ON %r: PROC zInitSpew(): PROC zInitLanded(): PROC zInitHunt(): PROC zInitCharge(): PROC zInitBrain(): PROC zInitWalk(): PROC zInitDead()
 ENDPROC
 
-DEFPROC zInitSpawn()
+DEFPROC zInitSpew()
 #; Make previous zombie sprite invisibile
 SPRITE %7,,,,%0:
 
@@ -392,14 +391,6 @@ ELSE SPRITE CONTINUE %50,%152 TO %w STEP 1 RUN ,%96 TO %y STEP 1 STOP ,%8,%$41,%
 ENDIF
 #; Multiply x position by 8 for sub-pixel positioning
 %w=%w << 3
-ENDPROC
-
-DEFPROC zSpawn()
-#; Next state Spew - track the demon's spew progress as it travels to the ground
-PROC zomState(zSpew)
-ENDPROC
-
-DEFPROC zInitSpew()
 #;Counter to animate the spew
 %o=5
 ENDPROC
@@ -472,7 +463,7 @@ SPRITE %7,%w>>3,%y,%32,%1: SPRITE CONTINUE %7,STOP,STOP,%32 TO %33,%$50,%3,%0
 ENDPROC
 
 DEFPROC zDead()
-%o-=1: IF %o=0 THEN PROC zomState(zSpawn)
+%o-=1: IF %o=0 THEN PROC zomState(zSpew)
 ENDPROC
 
 #; 0 - xSpawn
