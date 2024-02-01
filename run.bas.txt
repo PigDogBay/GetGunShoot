@@ -276,6 +276,8 @@ SPRITE CONTINUE %9,,,%52 TO %53
 SPRITE %6,,,,%0
 #; Update gun state to collected
 %u=2
+#;Update the zombie state (if hunting) to charging
+IF %r=2 THEN PROC zomState(zCharge)
 ENDPROC
 
 DEFPROC pInitShoot()
@@ -297,6 +299,8 @@ SPRITE %20,%j,%y+8,%0,%1
 %j=%i-40:IF %j>319 THEN %j=0
 SPRITE CONTINUE %20,%j TO 319 STEP -4 RUN ,%y+8,%0 TO %3,%3
 ENDIF
+#;Update the zombie state (if charging) to hunting
+IF %r=3 THEN PROC zomState(zHunt)
 ENDPROC
 
 DEFPROC pShoot()
