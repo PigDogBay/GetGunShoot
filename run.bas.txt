@@ -186,7 +186,7 @@ SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
 PROC pState(pRun)
-#;--PROC zomState(zSpew)
+#; -- PROC zomState(zSpew)
 %r=-1
 ENDPROC
 
@@ -504,6 +504,8 @@ SPRITE %c,%152,%98,%6,%1
 IF %i < 152: SPRITE CONTINUE %c,%i TO %153 STEP -2 RUN ,%96 TO %230 STEP 1 STOP ,%6,%$41,%0,%0
 ELSE SPRITE CONTINUE %c,%152 TO %i STEP 2 RUN ,%96 TO %230 STEP 1 STOP ,%6,%$41,%0,%0
 ENDIF
+#; Animation counter
+%t(c)=0
 ENDPROC
 
 DEFPROC xSpawn()
@@ -511,59 +513,99 @@ DEFPROC xSpawn()
 IF %SPRITE AT (c,1) > 200 THEN PROC soulState(xFloat): ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p < 3) THEN PROC soulState(xTrap)
+IF %i=9 AND (p < 3) THEN PROC soulState(xTrap): ENDPROC
+#; Animate
+IF %t(c)=2: SPRITE CONTINUE %c,,,%7
+ELSE IF %t(c)=4:%t(c)=%0: SPRITE CONTINUE %c,,,%6
+ENDIF
+%t(c)+=%1
 ENDPROC
 
 DEFPROC xInitFloat()
 SPRITE %c,,,%26,%1
-SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%26 TO %27,%$3,%2,%50+RND 100
+SPRITE CONTINUE %c, STOP ,%60 TO %240 STEP -1 RUN ,%26,%$3,%2,%50+ RND 100
+%t(c)=0
 ENDPROC
 
 DEFPROC xFloat()
 IF % NOT SPRITE c THEN PROC soulState(xBlood): ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p < 3) THEN PROC soulState(xFreed)
+IF %i=9 AND (p < 3) THEN PROC soulState(xFreed): ENDPROC
+#; Animate
+IF %t(c)=5: SPRITE CONTINUE %c,,,%27
+ELSE IF %t(c)=10:%t(c)=%0: SPRITE CONTINUE %c,,,%26
+ENDIF
+%t(c)+=%1
 ENDPROC
 
 DEFPROC xInitFreed()
 #; Send an Angel up to heaven
 SPRITE %c,,,%22,%1
-SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%22 TO %23,%$3,%0,%0
+SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%22,%$3,%0,%0
+#; Animation counter
+%t(c)=0
 ENDPROC
 DEFPROC xFreed()
 IF % NOT SPRITE c THEN PROC soulState(xGift): ENDPROC
+#; Animate
+IF %t(c)=2: SPRITE CONTINUE %c,,,%23
+ELSE IF %t(c)=4:%t(c)=%0: SPRITE CONTINUE %c,,,%22
+ENDIF
+%t(c)+=%1
 ENDPROC
 
 DEFPROC xInitGift()
 #; Send a speed boost down to the player
 SPRITE %c,,,%10,%1
-SPRITE CONTINUE %c,STOP,%60 TO %y STEP 1 RUN,%10 TO %11,%$2,%0,%0
+SPRITE CONTINUE %c, STOP ,%60 TO %y STEP 1 RUN ,%10,%$2,%0,%0
+#; Animation counter
+%t(c)=0
 ENDPROC
 DEFPROC xGift()
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p < 3) THEN PROC addBoost():PROC soulState(xLimbo)
+IF %i=9 AND (p < 3) THEN PROC addBoost(): PROC soulState(xLimbo): ENDPROC
+#; Animate
+IF %t(c)=2: SPRITE CONTINUE %c,,,%11
+ELSE IF %t(c)=4:%t(c)=%0: SPRITE CONTINUE %c,,,%10
+ENDIF
+%t(c)+=%1
 ENDPROC
 
 DEFPROC xInitBlood()
 SPRITE %c,,,%28,%1
-SPRITE CONTINUE %c,STOP,%60 TO %240 STEP 1 RUN,%28 TO %29,%$3,%0,%0
+SPRITE CONTINUE %c, STOP ,%60 TO %240 STEP 1 RUN ,%28,%$3,%0,%0
+#; Animation counter
+%t(c)=0
 ENDPROC
 DEFPROC xBlood()
 IF % NOT SPRITE c THEN PROC soulState(xLimbo) : ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
 IF %i=9 AND (p < 3) THEN %d=%8
+#; Animate
+IF %t(c)=2: SPRITE CONTINUE %c,,,%29
+ELSE IF %t(c)=4:%t(c)=%0: SPRITE CONTINUE %c,,,%28
+ENDIF
+%t(c)+=%1
 ENDPROC
 
 DEFPROC xInitTrap()
 SPRITE %c,,,%26,%1
-SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%26 TO %27,%$3,%4,%50+RND 100
+SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%26,%$3,%4,%50+RND 100
 PROC pState(pCaught)
+#; Animation counter
+%t(c)=0
 ENDPROC
+
 DEFPROC xTrap()
 IF % NOT SPRITE c THEN PROC soulState(xBlood): ENDPROC
+#; Animate
+IF %t(c)=5: SPRITE CONTINUE %c,,,%27
+ELSE IF %t(c)=10:%t(c)=%0: SPRITE CONTINUE %c,,,%26
+ENDIF
+%t(c)+=%1
 ENDPROC
 
 #; Don't show any sprites, wait a random time before spawning
