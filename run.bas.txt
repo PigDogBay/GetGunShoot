@@ -202,18 +202,12 @@ ON %s(c): PROC xSpawn(): PROC xFloat(): PROC xFreed(): PROC xGift(): PROC xBlood
 #; Only need to update the gun state as it is being dropped in
 IF %u=0 THEN PROC gunFly()
 #; Player state machine
-on %p: PROC pMove():PROC pMove():PROC pShoot():PROC pDead():PROC pCaught()
+on %p: PROC pRun():PROC pGun():PROC pShoot():PROC pDead():PROC pCaught()
 #; Zombie state machine
 ON %r: PROC zSpew(): PROC zLanded(): PROC zMove(%9): PROC zMove(%18): PROC zBrain(): PROC zWalk(): PROC zDead()
 
-#; *** COLLISION DETECTION ***
-%i = SPRITE OVER (%9,%6 TO %7,%7) 
-IF %i=6: PROC pState(pGun)
-#; Only kill player if zombie is active and player not already dead
-ELSE IF %i=7 AND (r<>6) AND (p<3): PROC pState(pDead)
-ENDIF
-
 ENDPROC
+
 
 DEFPROC initDie()
 timer = TIME
@@ -267,6 +261,20 @@ PROC gunSpawn()
 IF %r=3 THEN PROC zomState(zHunt)
 ENDPROC
 
+DEFPROC pRun()
+PROC pMove()
+#; *** COLLISION DETECTION ***
+#; Sprites Player 9, Gun 6, Zombie 7
+#; Check if player has walked over the gun or the zombie has caught them
+%i = SPRITE OVER (%9,%6 TO %7,%7) 
+IF %i=6: PROC pState(pGun)
+#; Only kill player if zombie is active
+ELSE IF %i=7 AND (r<>6): PROC pState(pDead)
+ENDIF
+
+ENDPROC
+
+
 #; Player has walked over the gun
 #; Change player sprite to holding the gun
 #; Remove the gun sprite
@@ -281,6 +289,17 @@ SPRITE %6,,,,%0
 #;Update the zombie state (if hunting) to charging
 IF %r=2 THEN PROC zomState(zCharge)
 ENDPROC
+
+DEFPROC pGun()
+PROC pMove()
+#; *** COLLISION DETECTION ***
+#; Sprites Player 9, Zombie 7
+#; Check if player has been caught by the zombie
+%i = SPRITE OVER (%9,%7,%7) 
+#; Only kill player if zombie is active
+IF %i=7 AND (r<>6) THEN PROC pState(pDead)
+ENDPROC
+
 
 DEFPROC pInitShoot()
 #; Set gun state to shooting
