@@ -580,7 +580,7 @@ ENDPROC
 DEFPROC xInitGift()
 #; Send a speed boost down to the player
 SPRITE %c,,,%10,%1
-SPRITE CONTINUE %c, STOP ,%60 TO %y STEP 1 RUN ,%10,%$2,%0,%0
+SPRITE CONTINUE %c, STOP ,%60 TO %y STEP 1 RUN ,%10,%$42,%0,%0
 #; Animation counter
 %t(c)=0
 DRIVER %49,%2,%32
