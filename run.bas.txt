@@ -186,7 +186,8 @@ SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
 PROC pState(pRun)
-PROC zomState(zSpew)
+#;--PROC zomState(zSpew)
+%r=-1
 ENDPROC
 
 DEFPROC game()
@@ -553,7 +554,7 @@ DEFPROC xBlood()
 IF % NOT SPRITE c THEN PROC soulState(xLimbo) : ENDPROC
 #; Check if hit player sprite and player is not dead
 %i= SPRITE OVER (%c,%9,%7)
-IF %i=9 AND (p < 3) AND (d=0) THEN %d=16
+IF %i=9 AND (p < 3) THEN %d=%8
 ENDPROC
 
 DEFPROC xInitTrap()
