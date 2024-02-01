@@ -286,6 +286,7 @@ SPRITE CONTINUE %9,,,%52 TO %53
 SPRITE %6,,,,%0
 #; Update gun state to collected
 %u=2
+score+=25:PROC score()
 #;Update the zombie state (if hunting) to charging
 IF %r=2 THEN PROC zomState(zCharge)
 ENDPROC
@@ -326,7 +327,7 @@ DEFPROC pShoot()
 PROC pMove()
 #; Check if zombie shot
 %i= SPRITE OVER (%20,%7,%7)
-IF %i=7 THEN PROC zomState(zDead)
+IF %i=7 AND (r<>6) THEN PROC zomState(zDead)
 #;Increase counter and return to pRun state when expired
 IF %u=20 THEN PROC pState(pRun): ELSE %u+=1
 ENDIF
@@ -392,6 +393,7 @@ IF %n < 9 THEN %n+=%1
 SPRITE %22,%x>>3,%y,%10,%1
 SPRITE CONTINUE %22,%0 TO %319 STEP 4 RUN ,%0 TO %200 STEP -4 RUN ,%10,%3,%0,%0
 PROC hudBoosts()
+score+=50:PROC score()
 ENDPROC
 
 #;
@@ -480,7 +482,9 @@ DEFPROC zWalk():ENDPROC
 
 DEFPROC zInitDead()
 #; Change zombie pattern to head 'blowed' off
-SPRITE %7,%w>>3,%y,%32,%1: SPRITE CONTINUE %7,STOP,STOP,%32 TO %33,%$50,%3,%0
+SPRITE %7,%w >> 3,%y,%32,%1: SPRITE CONTINUE %7, STOP , STOP ,%32 TO %33,%$50,%3,%0
+score+=250:PROC score()
+
 #; Zombie dead timer
 %o=%75
 ENDPROC
@@ -545,7 +549,8 @@ ENDPROC
 DEFPROC xInitFreed()
 #; Send an Angel up to heaven
 SPRITE %c,,,%22,%1
-SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%22,%$3,%0,%0
+SPRITE CONTINUE %c, STOP ,%60 TO %240 STEP -1 RUN ,%22,%$3,%0,%0
+score+=100:PROC score()
 #; Animation counter
 %t(c)=0
 ENDPROC
