@@ -372,7 +372,7 @@ IF %i&$10 THEN %a+=1 : ELSE %a=0
 #; Run (%p=0) - Boost
 #; Run (%p=1) - Shoot
 IF %a=1:%a+=%1
-IF %p=0 THEN PROC pBoost() : ELSE PROC pState(pShoot)
+IF %p=1 THEN PROC pState(pShoot) : ELSE PROC pBoost()
 ENDIF
 
 #; X-Pos bounds check, warp to otherside of screen
