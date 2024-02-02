@@ -213,10 +213,11 @@ ENDPROC
 DEFPROC initDie()
 timer = TIME
 LAYER %0: PRINT AT %13,%12;INK 2;"Game Over"
-DRIVER %49,%2,%56
 IF score > high THEN high=score: DRIVER %49,%2,%49:PROC saveHS(high)
 PROC hiScore()
 DRIVER %49,%2,%47
+#; Zombie run walk aimlessly if around
+IF %r=2 OR (r=3) THEN : PROC zomState(zWalk)
 ENDPROC
 
 DEFPROC die()
@@ -351,8 +352,6 @@ DEFPROC pDead():ENDPROC
 DEFPROC pInitCaught()
 #; Turn off player sprite
 SPRITE %9,,,,%0
-#; Zombie run walk aimlessly if around
-#;PROC zomState(zWalk)
 DRIVER %49,%2,%24
 PROC state(sDie)
 ENDPROC
@@ -444,8 +443,9 @@ ENDPROC
 
 #; Determine what state to set the zombie
 DEFPROC zLanded()
+#; Player maybe dead to so need to walk aimlessly
+IF %s=3 THEN PROC zomState(zWalk):ENDPROC
 #; Check if player is holding the gun
-#; TODO, player maybe dead to so need to walk aimlessly
 IF %p=1 THEN PROC zomState(zCharge): ELSE PROC zomState(zHunt)
 ENDPROC
 
@@ -484,6 +484,7 @@ DEFPROC zBrain():ENDPROC
 
 #;Walk slowly back and forth as player is dead
 DEFPROC zInitWalk()
+SPRITE PAUSE %50: SPRITE %50,,,,%0
 SPRITE %7,%w>>3,%y,%36,%1:SPRITE CONTINUE %7,%64 TO %260 STEP 1 RUN,STOP,%36 TO %37,%$58,%3,%0
 ENDPROC
 DEFPROC zWalk():ENDPROC
