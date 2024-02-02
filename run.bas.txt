@@ -617,21 +617,15 @@ ENDIF
 %t(c)+=%1
 ENDPROC
 
+#; Player has been caught in a soul trap
 DEFPROC xInitTrap()
-SPRITE %c,,,%26,%1
-SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%26,%$3,%4,%50+RND 100
+SPRITE %c,,,%30,%1
+SPRITE CONTINUE %c,STOP,%60 TO %240 STEP -1 RUN,%30 TO %31,%$3,%4,%0
 PROC pState(pCaught)
-#; Animation counter
-%t(c)=0
 ENDPROC
 
 DEFPROC xTrap()
 IF % NOT SPRITE c THEN PROC soulState(xBlood): ENDPROC
-#; Animate
-IF %t(c)=5: SPRITE CONTINUE %c,,,%27
-ELSE IF %t(c)=10:%t(c)=%0: SPRITE CONTINUE %c,,,%26
-ENDIF
-%t(c)+=%1
 ENDPROC
 
 #; Don't show any sprites, wait a random time before spawning
