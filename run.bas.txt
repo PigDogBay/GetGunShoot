@@ -220,7 +220,8 @@ DRIVER %49,%2,%47
 ENDPROC
 
 DEFPROC die()
-IF %u=0 THEN PROC gunFly()
+#; Animate souls, gun and zombie still
+PROC game()
 #; Wait for 2 seconds
 IF (TIME-timer)< 100 THEN ENDPROC 
 %i = INPUT 1| INPUT 0
@@ -342,24 +343,21 @@ DEFPROC pInitDead()
 #; Change player pattern to death throw
 SPRITE %9,,,%48
 SPRITE CONTINUE %9,,,%48 TO %49,%$40,%10,%0
-ENDPROC
-DEFPROC pDead()
 PROC zomState(zBrain)
 PROC state(sDie)
 ENDPROC
+DEFPROC pDead():ENDPROC
 
 DEFPROC pInitCaught()
 #; Turn off player sprite
 SPRITE %9,,,,%0
 #; Zombie run walk aimlessly if around
-#;SPRITE %7,,,%44,%1
-#;SPRITE CONTINUE %7,%40 TO %240 STEP 1 RUN ,%y,%44 TO %45,%8,%10
+#;PROC zomState(zWalk)
 DRIVER %49,%2,%24
-ENDPROC
-
-DEFPROC pCaught()
 PROC state(sDie)
 ENDPROC
+
+DEFPROC pCaught():ENDPROC
 
 DEFPROC pMove()
 %i= INPUT 1| INPUT 0
