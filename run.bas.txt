@@ -183,10 +183,14 @@ SPRITE CONTINUE %9,,,%56 TO %57,%$50,%3,%0
 SPRITE %7,%64,%y,%36,%0:
 SPRITE -8,%0,%16,%2,%1,%2
 
-#; Grave Rat
+#; Grave Rat, House Zombie and Tree Bat
 #; Doesn't affect game play, just runs back and forth along the bottom of the screen
 SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
+SPRITE %41,%64,%116,%16,%$1
+SPRITE CONTINUE %41,%48 TO 100 STEP 1 RUN, STOP, %16 TO %17, %$8, %4, %0 
+SPRITE %42,%240,%100,%12,%$1
+SPRITE CONTINUE %42,%240 TO %270 STEP %4 RUN, %76 TO %108 STEP %2 RUN, %12 TO %13, %$0, %4, %0 
 
 PROC hudBoosts()
 
