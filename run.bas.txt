@@ -188,7 +188,7 @@ SPRITE -8,%0,%16,%2,%1,%2
 SPRITE %40,%32+RND 200,%208,%18,%$9
 SPRITE CONTINUE %40,%32 TO 272 STEP 1 RUN, STOP, %18 TO %19, %$8, %4, %0 
 
-PROC hudBoosts():PROC lives()
+PROC hudBoosts()
 
 PROC pState(pRun)
 PROC zomState(zSpew)
